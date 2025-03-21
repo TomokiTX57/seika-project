@@ -15,4 +15,14 @@ class Player extends Model
         'is_subscribed',
         'uid',
     ];
+
+    public function tournamentTransactions()
+    {
+        return $this->hasMany(TournamentTransaction::class);
+    }
+
+    public function ringTransactions()
+    {
+        return $this->hasMany(RingTransaction::class);
+    }
 }

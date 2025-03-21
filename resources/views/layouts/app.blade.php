@@ -27,7 +27,7 @@
 
 
         <div class="flex h-screen">
-            <!-- ✅ サイドバー -->
+            <!--  サイドバー -->
             <aside class="bg-red-500 w-56 p-6 h-screen flex flex-col">
                 <nav class="flex-1">
                     <ul class="space-y-4 text-white">

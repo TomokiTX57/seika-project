@@ -26,6 +26,8 @@ Route::get('/players/{player}', [PlayerController::class, 'show'])->name('player
 Route::post('/players', [PlayerController::class, 'store'])->name('players.store');
 Route::get('/players/{player}/edit', [PlayerController::class, 'edit'])->name('players.edit');
 Route::put('/players/{player}', [PlayerController::class, 'update'])->name('players.update');
+Route::post('/players/{player}/tournament-transactions', [PlayerController::class, 'storeTournamentTransaction'])->name('players.tournament.store');
+Route::get('/players/{player}/history', [PlayerController::class, 'history'])->name('players.history');
 
 Route::get('/dashboard', function () {
     return view('dashboard');
@@ -35,6 +37,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::post('/players/{player}/tournament-transactions', [PlayerController::class, 'storeTournamentTransaction'])->name('players.tournament.store');
 });
 
 require __DIR__ . '/auth.php';

@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Player;
+use App\Models\TournamentTransaction;
+use Illuminate\Support\Facades\Auth;
 
 class PlayerController extends Controller
 {
@@ -81,5 +83,43 @@ class PlayerController extends Controller
         ]);
 
         return redirect()->route('players.show', $player)->with('success', 'プレイヤー情報を更新しました');
+    }
+
+    public function storeTournamentTransaction(Request $request, Player $player)
+    {
+        \Log::info('フォーム送信受信:', $request->all()); // ← 追加
+
+        // もしここで止まっていたらログは出ない
+        $request->validate([
+            'chips' => 'required|integer',
+            'points' => 'nullable|integer',
+            'accounting_number' => 'nullable|string|max:255',
+            'comment' => 'nullable|string|max:1000',
+        ]);
+
+        \Log::info('バリデーション通過');
+
+        TournamentTransaction::create([
+            'player_id' => $player->id,
+            'store_id' => Auth::id(),
+            'chips' => $request->chips,
+            'points' => $request->points ?? 0,
+            'accounting_number' => $request->accounting_number,
+            'comment' => $request->comment,
+        ]);
+
+        \Log::info('トナメ取引を保存しました');
+
+        return redirect()->route('players.show', $player)->with('success', '保存しました');
+    }
+
+    public function history(Player $player, Request $request)
+    {
+        $tab = $request->query('tab', 'tournament'); // デフォルトで "tournament"
+
+        return view('players.history', [
+            'player' => $player,
+            'tab' => $tab,
+        ]);
     }
 }

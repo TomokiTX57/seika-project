@@ -41,7 +41,7 @@
             @endif
         </div>
 
-        <!-- ✅ Bootstrap ナビゲーションタブ -->
+        <!--  Bootstrap ナビゲーションタブ -->
         <ul class="nav nav-tabs mt-4" id="playerTabs" role="tablist">
             <li class="nav-item" role="presentation">
                 <button class="nav-link active" id="ring-tab" data-bs-toggle="tab" data-bs-target="#ring" type="button" role="tab" aria-controls="ring" aria-selected="true">
@@ -55,11 +55,11 @@
             </li>
         </ul>
 
-        <!-- ✅ タブの内容 -->
+        <!--  タブの内容 -->
         <div class="tab-content mt-3" id="playerTabsContent">
-            <!-- 🔹 リング -->
+
+            <!--  リング -->
             <div class="tab-pane fade show active" id="ring" role="tabpanel" aria-labelledby="ring-tab">
-                <h4>リング</h4>
                 <p><strong>保有チップ:</strong> ○○点</p>
 
                 <h5>cash-in</h5>
@@ -71,7 +71,8 @@
 
                 <div class="mb-2">
                     <label>0円システム</label>
-                    <button class="btn btn-primary d-block">ボタン</button>
+                    <input type="text" class="form-control">
+                    <button class="btn btn-primary mt-2">ボタン</button>
                 </div>
 
                 <h5>cash-out</h5>
@@ -86,39 +87,46 @@
                     <textarea class="form-control"></textarea>
                 </div>
 
-                <button class="btn btn-secondary mt-2">履歴</button>
+                <a href="{{ route('players.history', ['player' => $player->id, 'tab' => 'ring']) }}" class="btn btn-secondary mt-2">
+                    リング履歴を見る
+                </a>
             </div>
 
-            <!-- 🔹 トナメ -->
+            <!--  トナメ -->
             <div class="tab-pane fade" id="tournament" role="tabpanel" aria-labelledby="tournament-tab">
-                <h4>トナメ</h4>
-                <p><strong>保有チップ:</strong> ○○点</p>
-                <p><strong>保有ポイント:</strong> ○○点</p>
+                <form method="POST" action="{{ route('players.tournament.store', $player) }}">
+                    @csrf
 
-                <h5>cash-in</h5>
-                <div class="mb-2">
-                    <label>引き出し額</label>
-                    <input type="text" class="form-control">
-                    <button class="btn btn-primary mt-2">ボタン</button>
-                </div>
+                    <div class="mb-2">
+                        <label>チップ</label>
+                        <!-- 表示用（ユーザーが見る/入力する） -->
+                        <input type="text" id="chips_view" class="form-control" inputmode="numeric">
 
-                <h5>cash-out</h5>
-                <div class="mb-2">
-                    <label>アウト額</label>
-                    <input type="text" class="form-control">
-                    <button class="btn btn-primary mt-2">ボタン</button>
-                </div>
+                        <!-- 実際に送信される値（hidden） -->
+                        <input type="hidden" name="chips" id="chips_real">
+                    </div>
 
-                <div class="mb-2">
-                    <label>ポイント</label>
-                    <button class="btn btn-primary d-block">ボタン</button>
-                </div>
+                    <div class="mb-2">
+                        <label>ポイント</label>
+                        <input type="number" name="points" class="form-control">
+                    </div>
 
-                <div class="mb-2">
-                    <label>コメント入力</label>
-                    <textarea class="form-control"></textarea>
-                </div>
+                    <div class="mb-2">
+                        <label>会計番号</label>
+                        <input type="text" name="accounting_number" class="form-control" required>
+                    </div>
 
-                <button class="btn btn-secondary mt-2">履歴</button>
+                    <div class="mb-2">
+                        <label>コメント</label>
+                        <textarea name="comment" class="form-control"></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">登録</button>
+                </form>
+
+                <a href="{{ route('players.history', ['player' => $player->id, 'tab' => 'tournament']) }}" class="btn btn-outline-secondary mt-3">
+                    トナメ履歴を見る
+                </a>
             </div>
+        </div>
 </x-app-layout>
