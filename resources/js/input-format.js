@@ -4,11 +4,25 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (chipsView && chipsReal) {
         chipsView.addEventListener("input", function () {
-            const numericValue = chipsView.value
-                .replace(/,/g, "")
-                .replace(/[^\d]/g, "");
-            chipsView.value = Number(numericValue).toLocaleString();
-            chipsReal.value = numericValue;
+            let rawValue = chipsView.value.replace(/,/g, "");
+
+            // 数字と先頭のマイナスのみ許可
+            let numericValue = rawValue
+                .replace(/[^\d-]/g, "")
+                .replace(/(?!^)-/g, "");
+
+            // 整形表示（ただし "-" 単体はそのままにする）
+            if (numericValue === "-") {
+                chipsView.value = "-";
+                chipsReal.value = "";
+            } else if (numericValue) {
+                const number = parseInt(numericValue, 10);
+                chipsView.value = number.toLocaleString();
+                chipsReal.value = number;
+            } else {
+                chipsView.value = "";
+                chipsReal.value = "";
+            }
         });
     }
 });
