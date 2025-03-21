@@ -96,7 +96,7 @@
             <div class="tab-pane fade" id="tournament" role="tabpanel" aria-labelledby="tournament-tab">
                 <form method="POST" action="{{ route('players.tournament.store', $player) }}">
                     @csrf
-
+                    <p><strong>保有トナメチップ:</strong> {{ number_format($tournamentChips) }} 点</p>
                     <div class="mb-2">
                         <label>チップ</label>
                         <!-- 表示用（ユーザーが見る/入力する） -->

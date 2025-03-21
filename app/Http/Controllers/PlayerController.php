@@ -34,7 +34,10 @@ class PlayerController extends Controller
 
     public function show(Player $player)
     {
-        return view('players.show', compact('player'));
+
+        $tournamentChips = $player->tournamentTransactions()->sum('chips');
+
+        return view('players.show', compact('player', 'tournamentChips'));
     }
 
     public function create()

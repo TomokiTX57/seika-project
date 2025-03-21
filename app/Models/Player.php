@@ -19,6 +19,7 @@ class Player extends Model
     public function tournamentTransactions()
     {
         return $this->hasMany(TournamentTransaction::class);
+        return $this->hasMany(\App\Models\TournamentTransaction::class);
     }
 
     public function ringTransactions()
