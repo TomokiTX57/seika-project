@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PlayerController;
+use App\Http\Controllers\TournamentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -28,6 +29,8 @@ Route::get('/players/{player}/edit', [PlayerController::class, 'edit'])->name('p
 Route::put('/players/{player}', [PlayerController::class, 'update'])->name('players.update');
 Route::post('/players/{player}/tournament-transactions', [PlayerController::class, 'storeTournamentTransaction'])->name('players.tournament.store');
 Route::get('/players/{player}/history', [PlayerController::class, 'history'])->name('players.history');
+Route::get('/tournaments', [TournamentController::class, 'index'])->name('tournaments.index');
+Route::get('/tournaments/{tournament}/edit', [TournamentController::class, 'edit'])->name('tournaments.edit');
 
 Route::get('/dashboard', function () {
     return view('dashboard');
