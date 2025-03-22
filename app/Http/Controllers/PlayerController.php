@@ -50,6 +50,7 @@ class PlayerController extends Controller
         $request->validate([
             'player_name' => ['required', 'string', 'max:255'],
             'player_my_id' => ['nullable', 'string', 'max:255', 'unique:players,player_my_id'],
+            'comment' => ['nullable', 'string', 'max:1000'],
             'is_subscribed' => ['required', 'boolean'],
             'uid' => ['nullable', 'string', 'max:255'],
         ]);
@@ -57,6 +58,7 @@ class PlayerController extends Controller
         Player::create([
             'player_name' => $request->player_name,
             'player_my_id' => $request->player_my_id ?: null, // 空ならNULL
+            'comment' => $request->comment,
             'is_subscribed' => $request->is_subscribed,
             'uid' => $request->uid ?: null, // 空ならNULL
         ]);
@@ -74,6 +76,7 @@ class PlayerController extends Controller
         $request->validate([
             'player_name' => ['required', 'string', 'max:255'],
             'player_my_id' => ['nullable', 'string', 'max:255', 'unique:players,player_my_id,' . $player->id],
+            'comment' => ['nullable', 'string', 'max:1000'],
             'is_subscribed' => ['required', 'boolean'],
             'uid' => ['nullable', 'string', 'max:255'],
         ]);
@@ -81,6 +84,7 @@ class PlayerController extends Controller
         $player->update([
             'player_name' => $request->player_name,
             'player_my_id' => $request->player_my_id ?: null,
+            'comment' => $request->comment,
             'is_subscribed' => $request->is_subscribed,
             'uid' => $request->uid ?: null,
         ]);

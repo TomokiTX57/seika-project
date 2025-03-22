@@ -12,6 +12,7 @@ class Player extends Model
     protected $fillable = [
         'player_name',  // 追加
         'player_my_id',
+        'comment',
         'is_subscribed',
         'uid',
     ];

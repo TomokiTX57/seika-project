@@ -21,6 +21,12 @@
             <span>{{ $player->player_my_id }}</span>
         </div>
 
+        <!-- comment -->
+        <div class="border p-4 rounded mb-4">
+            <span class="font-bold">コメント:</span>
+            <span></span>{{ $player->comment }}</span>
+        </div>
+
         <!-- サブスク表示 -->
         @if ($player->is_subscribed)
         <div class="text-red-500 font-bold mb-4">サブスク利用中</div>

@@ -22,6 +22,12 @@
                 <input type="text" name="player_my_id" class="w-full border rounded p-2" value="{{ old('player_my_id', $player->player_my_id) }}">
             </div>
 
+            <!-- comment -->
+            <div class="mb-4">
+                <label class="block font-bold">コメント:</label>
+                <textarea name="comment" class="w-full border rounded p-2">{{ old('comment', $player->comment) }}</textarea>
+            </div>
+
             <!-- サブスク -->
             <div class="mb-4">
                 <label class="block font-bold">サブスク:</label>
