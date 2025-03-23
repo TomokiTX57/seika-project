@@ -13,17 +13,41 @@ class TournamentController extends Controller
     {
         $date = $request->input('date', Carbon::today()->toDateString());
 
-        $transactions = TournamentTransaction::whereDate('created_at', $date)
-            ->with('player') // プレイヤー名を取得する前提
+        // 該当日付のトーナメントトランザクションを取得
+        $transactions = TournamentTransaction::with(['player.tournamentTransactions'])
+            ->whereDate('created_at', $date)
             ->orderBy('created_at', 'asc')
             ->get();
 
-        return view('tournaments.index', compact('transactions', 'date'));
+        // その日付にトランザクションがあるプレイヤーごとにまとめる
+        $groupedByPlayer = $transactions->groupBy('player_id');
+
+        return view('tournaments.index', [
+            'transactions' => $transactions,
+            'date' => $date,
+            'groupedByPlayer' => $groupedByPlayer
+        ]);
     }
 
     public function edit($id)
     {
         $transaction = TournamentTransaction::with('player')->findOrFail($id);
         return view('tournaments.edit', compact('transaction'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $transaction = TournamentTransaction::findOrFail($id);
+
+        $request->validate([
+            'chips' => ['required', 'integer', 'min:0'],
+            'points' => ['required', 'integer', 'min:0'],
+            'accounting_number' => ['nullable', 'string', 'max:255'],
+            'comment' => ['nullable', 'string', 'max:1000'],
+        ]);
+
+        $transaction->update($request->only(['chips', 'points', 'accounting_number', 'comment']));
+
+        return redirect()->route('tournaments.index');
     }
 }

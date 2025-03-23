@@ -24,33 +24,42 @@
         </form>
 
         <!-- 一覧テーブル -->
-        <table class="table-auto w-full border">
-            <thead>
-                <tr class="bg-gray-100">
-                    <th class="border px-2 py-1">会計番号</th>
-                    <th class="border px-2 py-1">プレイヤーネーム</th>
-                    <th class="border px-2 py-1">保有チップ</th>
-                    <th class="border px-2 py-1">ランキング</th>
-                    <th class="border px-2 py-1">付与チップ</th>
-                    <th class="border px-2 py-1">ポイント</th>
-                    <th class="border px-2 py-1">操作</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach ($transactions as $tx)
-                <tr>
-                    <td class="border px-2 py-1">{{ $tx->accounting_number }}</td>
-                    <td class="border px-2 py-1">{{ $tx->player->player_name ?? '不明' }}</td>
-                    <td class="border px-2 py-1 text-right">{{ number_format($tx->player->tournament_chips ?? 0) }}</td>
-                    <td class="border px-2 py-1 text-center">3</td> {{-- 仮ランキング --}}
-                    <td class="border px-2 py-1 text-right">{{ $tx->chips }}</td>
-                    <td class="border px-2 py-1 text-right">{{ $tx->points }}</td>
-                    <td class="border px-2 py-1 text-center">
-                        <a href="{{ route('tournaments.edit', $tx->id) }}" class="px-2 py-1 bg-blue-500 text-white rounded">編集</a>
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
+        <div clas="boarder p-4 bg-white">
+            <table class="w-full border-collapse">
+                <thead>
+                    <tr class="border-b">
+                        <th class="border px-2 py-1">会計番号</th>
+                        <th class="border px-2 py-1">プレイヤーネーム</th>
+                        <th class="border px-2 py-1">保有チップ</th>
+                        <th class="border px-2 py-1">ランキング</th>
+                        <th class="border px-2 py-1">付与チップ</th>
+                        <th class="border px-2 py-1">ポイント</th>
+                        <th class="border px-2 py-1">操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                <tbody>
+                    @foreach ($groupedByPlayer as $playerId => $playerTransactions)
+                    @php
+                    $player = $playerTransactions->first()->player;
+                    $chipSum = $player->tournamentTransactions->sum('chips');
+                    $firstTx = $playerTransactions->first();
+                    @endphp
+                    <tr>
+                        <td class="border px-2 py-1">{{ $firstTx->accounting_number ?? '--' }}</td>
+                        <td class="border px-2 py-1">{{ $player->player_name ?? '不明' }}</td>
+                        <td class="border px-2 py-1 text-right">{{ number_format($chipSum) }}</td>
+                        <td class="border px-2 py-1 text-center">--</td> {{-- ランキング仮 --}}
+                        <td class="border px-2 py-1 text-right">{{ $firstTx->chips }}</td>
+                        <td class="border px-2 py-1 text-right">{{ $firstTx->points }}</td>
+                        <td class="border px-2 py-1 text-center">
+                            <a href="{{ route('tournaments.edit', $firstTx->id) }}" class="px-2 py-1 bg-blue-500 text-white rounded">編集</a>
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+                </tbody>
+            </table>
+        </div>
     </div>
 </x-app-layout>

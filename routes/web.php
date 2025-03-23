@@ -31,6 +31,8 @@ Route::post('/players/{player}/tournament-transactions', [PlayerController::clas
 Route::get('/players/{player}/history', [PlayerController::class, 'history'])->name('players.history');
 Route::get('/tournaments', [TournamentController::class, 'index'])->name('tournaments.index');
 Route::get('/tournaments/{tournament}/edit', [TournamentController::class, 'edit'])->name('tournaments.edit');
+Route::put('/tournaments/{tournament}', [TournamentController::class, 'update'])->name('tournaments.update');
+
 
 Route::get('/dashboard', function () {
     return view('dashboard');
