@@ -129,4 +129,10 @@ class PlayerController extends Controller
             'tab' => $tab,
         ]);
     }
+
+    public function subscribed()
+    {
+        $players = Player::where('is_subscribed', true)->orderBy('player_name')->get();
+        return view('players.subscribed', compact('players'));
+    }
 }

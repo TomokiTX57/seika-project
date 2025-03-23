@@ -34,7 +34,7 @@
                         <li><a href="{{ route('players.index') }}" class="block px-4 py-2 hover:bg-blue-700">Player検索</a></li>
                         <li><a href="#" class="block px-4 py-2 hover:bg-blue-700">0円システム利用者表示</a></li>
                         <li><a href="{{ route('tournaments.index') }}" class="block px-4 py-2 hover:bg-blue-700">トーナメント</a></li>
-                        <li><a href="#" class="block px-4 py-2 hover:bg-blue-700">サブスク</a></li>
+                        <li><a href="{{ route('players.subscribed') }}" class="block px-4 py-2 hover:bg-blue-700">サブスク利用者表示</a></li>
                     </ul>
                 </nav>
             </aside>

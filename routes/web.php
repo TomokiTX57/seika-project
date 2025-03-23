@@ -32,6 +32,7 @@ Route::get('/players/{player}/history', [PlayerController::class, 'history'])->n
 Route::get('/tournaments', [TournamentController::class, 'index'])->name('tournaments.index');
 Route::get('/tournaments/{tournament}/edit', [TournamentController::class, 'edit'])->name('tournaments.edit');
 Route::put('/tournaments/{tournament}', [TournamentController::class, 'update'])->name('tournaments.update');
+Route::get('/subscribed-players', [PlayerController::class, 'subscribed'])->name('players.subscribed');
 
 
 Route::get('/dashboard', function () {
