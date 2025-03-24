@@ -34,6 +34,7 @@
                         <th class="border px-2 py-1">ランキング</th>
                         <th class="border px-2 py-1">付与チップ</th>
                         <th class="border px-2 py-1">ポイント</th>
+                        <th class="border px-2 py-1">エントリー</th>
                         <th class="border px-2 py-1">操作</th>
                     </tr>
                 </thead>
@@ -44,6 +45,7 @@
                     $player = $playerTransactions->first()->player;
                     $chipSum = $player->tournamentTransactions->sum('chips');
                     $firstTx = $playerTransactions->first();
+                    $entrySum = $playerTransactions->sum('entry');
                     @endphp
                     <tr>
                         <td class="border px-2 py-1">{{ $firstTx->accounting_number ?? '--' }}</td>
@@ -52,6 +54,7 @@
                         <td class="border px-2 py-1 text-center">--</td> {{-- ランキング仮 --}}
                         <td class="border px-2 py-1 text-right">{{ $firstTx->chips }}</td>
                         <td class="border px-2 py-1 text-right">{{ $firstTx->points }}</td>
+                        <td class="border px-2 py-1 text-center">{{ number_format($entrySum) }}</td>
                         <td class="border px-2 py-1 text-center">
                             <a href="{{ route('tournaments.edit', $firstTx->id) }}" class="px-2 py-1 bg-blue-500 text-white rounded">編集</a>
                         </td>

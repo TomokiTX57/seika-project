@@ -40,13 +40,14 @@ class TournamentController extends Controller
         $transaction = TournamentTransaction::findOrFail($id);
 
         $request->validate([
-            'chips' => ['required', 'integer', 'min:0'],
+            'chips' => ['nullable', 'integer', 'min:0'],
             'points' => ['required', 'integer', 'min:0'],
             'accounting_number' => ['nullable', 'string', 'max:255'],
+            'entry' => ['required', 'integer', 'min:0'],
             'comment' => ['nullable', 'string', 'max:1000'],
         ]);
 
-        $transaction->update($request->only(['chips', 'points', 'accounting_number', 'comment']));
+        $transaction->update($request->only(['chips', 'points', 'entry', 'accounting_number', 'comment']));
 
         return redirect()->route('tournaments.index');
     }

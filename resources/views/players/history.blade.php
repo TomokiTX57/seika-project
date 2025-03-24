@@ -66,6 +66,7 @@
                             <th>日付</th>
                             <th>チップ</th>
                             <th>ポイント</th>
+                            <th>エントリー</th>
                             <th>会計番号</th>
                             <th>コメント</th>
                         </tr>
@@ -76,6 +77,7 @@
                             <td>{{ $tx->created_at->format('Y-m-d H:i') }}</td>
                             <td>{{ $tx->chips }}</td>
                             <td>{{ $tx->points }}</td>
+                            <td>{{ $tx->entry  }}</td>
                             <td>{{ $tx->accounting_number }}</td>
                             <td>{{ $tx->comment }}</td>
                         </tr>

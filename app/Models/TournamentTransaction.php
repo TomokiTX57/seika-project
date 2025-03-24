@@ -14,6 +14,7 @@ class TournamentTransaction extends Model
         'store_id',
         'chips',
         'points',
+        'entry',
         'accounting_number',
         'comment',
     ];

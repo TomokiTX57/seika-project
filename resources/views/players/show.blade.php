@@ -123,6 +123,11 @@
                     </div>
 
                     <div class="mb-2">
+                        <label>エントリー</label>
+                        <input type="number" name="entry" class="form-control">
+                    </div>
+
+                    <div class="mb-2">
                         <label>コメント</label>
                         <textarea name="comment" class="form-control"></textarea>
                     </div>

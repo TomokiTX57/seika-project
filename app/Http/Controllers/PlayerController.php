@@ -98,8 +98,9 @@ class PlayerController extends Controller
 
         // もしここで止まっていたらログは出ない
         $request->validate([
-            'chips' => 'required|integer',
+            'chips' => 'nullable|integer',
             'points' => 'nullable|integer',
+            'entry' => 'required|integer',
             'accounting_number' => 'nullable|string|max:255',
             'comment' => 'nullable|string|max:1000',
         ]);
@@ -111,9 +112,12 @@ class PlayerController extends Controller
             'store_id' => Auth::id(),
             'chips' => $request->chips,
             'points' => $request->points ?? 0,
+            'entry' => $request->entry,
             'accounting_number' => $request->accounting_number,
             'comment' => $request->comment,
         ]);
+
+        \Log::info('Entryの値:', ['entry' => $request->entry]);
 
         \Log::info('トナメ取引を保存しました');
 

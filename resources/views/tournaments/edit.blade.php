@@ -18,7 +18,7 @@
 
                 <div class="mb-3">
                     <label class="form-label">チップ</label>
-                    <input type="number" name="chips" class="form-control" value="{{ old('chips', $transaction->chips) }}" required>
+                    <input type="number" name="chips" class="form-control" value="{{ old('chips', $transaction->chips) }}">
                 </div>
 
                 <div class="mb-3">
@@ -27,19 +27,23 @@
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label">会計番号</label>
-                    <input type="text" name="accounting_number" class="form-control" value="{{ old('accounting_number', $transaction->accounting_number) }}">
-                </div>
+                    <label class="form-label">エントリー</label>
+                    <input type="text" name="entry" class="form-control" value="{{ old('entry', $transaction->entry) }}">
 
-                <div class="mb-3">
-                    <label class="form-label">コメント</label>
-                    <textarea name="comment" class="form-control">{{ old('comment', $transaction->comment) }}</textarea>
-                </div>
+                    <div class="mb-3">
+                        <label class="form-label">会計番号</label>
+                        <input type="text" name="accounting_number" class="form-control" value="{{ old('accounting_number', $transaction->accounting_number) }}">
+                    </div>
 
-                <div class="text-center">
-                    <button type="submit" class="btn btn-primary">更新</button>
-                    <a href="{{ route('tournaments.index') }}" class="btn btn-secondary">戻る</a>
-                </div>
+                    <div class="mb-3">
+                        <label class="form-label">コメント</label>
+                        <textarea name="comment" class="form-control">{{ old('comment', $transaction->comment) }}</textarea>
+                    </div>
+
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-primary">更新</button>
+                        <a href="{{ route('tournaments.index') }}" class="btn btn-secondary">戻る</a>
+                    </div>
             </form>
         </div>
     </div>
