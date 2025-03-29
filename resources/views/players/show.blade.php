@@ -33,8 +33,8 @@
         @endif
 
         <!-- 0円システム or 引き出し利用中 -->
-        <div class="border p-4 rounded mb-4">
-            0円システム利用中 / 引き出し利用中 のどちらかを表示
+        <div class="border p-4 rounded mb-4 text-white {{ $player->hasUnsettledZeroSystem() ? 'bg-danger' : 'bg-success' }}">
+            {{ $chipStatus }}
         </div>
 
         <!-- QRコード -->
@@ -71,22 +71,29 @@
                     0円システム: {{ number_format($unsettledZeroChips) }} 点<br>
                     合計: <strong>{{ number_format($totalRingChips) }} 点</strong>
                 </p>
-                <!-- リング：引き出し -->
+                <!-- 引き出しフォーム -->
                 <form method="POST" action="{{ route('players.ring.withdraw', $player) }}">
                     @csrf
                     <div class="mb-2">
                         <label>引き出し額</label>
                         <input type="number" name="withdraw_amount" class="form-control" required>
-                        @error('withdraw_amount')
-                        <div class="text-danger">{{ $message }}</div>
-                        @enderror
                     </div>
                     <div class="mb-2">
                         <label>コメント</label>
                         <textarea name="withdraw_comment" class="form-control"></textarea>
                     </div>
-                    <button type="submit" class="btn btn-primary mt-2" {{ $player->hasUnsettledZeroSystem() ? 'disabled' : '' }}>引き出し</button>
+
+                    <button type="submit" class="btn btn-primary mt-2"
+                        {{ $player->hasUnsettledZeroSystem() ? 'disabled' : '' }}>
+                        引き出し
+                    </button>
                 </form>
+
+                @if ($player->hasUnsettledZeroSystem())
+                <div class="text-danger mt-1">
+                    ※ 0円システム精算が完了するまで引き出しできません
+                </div>
+                @endif
 
                 <!-- リング：0円システム -->
                 <form method="POST" action="{{ route('players.zero-system.store', $player) }}">
@@ -114,6 +121,10 @@
                         <a href="{{ route('players.ring.settle', $player) }}" class="btn btn-secondary">精算</a>
                     </div>
                 </form>
+
+                <a href="{{ route('players.history', ['player' => $player->id, 'tab' => 'ring']) }}" class="btn btn-outline-secondary mt-3">
+                    リング履歴を見る
+                </a>
             </div>
 
             <!-- トナメ -->

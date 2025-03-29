@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PlayerController;
 use App\Http\Controllers\TournamentController;
 
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes

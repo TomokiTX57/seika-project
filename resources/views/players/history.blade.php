@@ -35,7 +35,7 @@
                         <tr>
                             <th>日付</th>
                             <th>チップ</th>
-                            <th>0円システム</th>
+                            <!-- <th>種別</th> -->
                             <th>会計番号</th>
                             <th>コメント</th>
                         </tr>
@@ -45,7 +45,7 @@
                         <tr>
                             <td>{{ $tx->created_at->format('Y-m-d H:i') }}</td>
                             <td>{{ $tx->chips }}</td>
-                            <td>{{ $tx->is_zero_system ? '✅' : '✖' }}</td>
+                            <!-- <td>{{ $tx->is_zero_system ? '0円システム' : '引き出し' }}</td> -->
                             <td>{{ $tx->accounting_number }}</td>
                             <td>{{ $tx->comment }}</td>
                         </tr>

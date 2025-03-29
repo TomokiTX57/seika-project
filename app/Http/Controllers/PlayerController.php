@@ -43,6 +43,7 @@ class PlayerController extends Controller
         $tournamentChips = $player->tournamentTransactions()->sum('chips');
         $ringChips = $player->ringTransactions()->sum('chips');
 
+        // 未精算の0円システムチップ
         $unsettledZeroChips = \App\Models\ZeroSystemDetail::whereHas('header', function ($query) use ($player) {
             $query->where('player_id', $player->id)
                 ->whereDate('created_at', now()->toDateString())
@@ -51,12 +52,16 @@ class PlayerController extends Controller
 
         $totalRingChips = $ringChips + $unsettledZeroChips;
 
+        // 利用状態（表示用）
+        $chipStatus = $player->hasUnsettledZeroSystem() ? '0円システム利用中' : '通常チップ利用中';
+
         return view('players.show', compact(
             'player',
             'tournamentChips',
             'ringChips',
             'unsettledZeroChips',
-            'totalRingChips'
+            'totalRingChips',
+            'chipStatus'
         ));
     }
 
