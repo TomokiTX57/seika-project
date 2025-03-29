@@ -61,54 +61,70 @@
             </li>
         </ul>
 
-        <!--  タブの内容 -->
+        <!-- タブの内容 -->
         <div class="tab-content mt-3" id="playerTabsContent">
-
-            <!--  リング -->
+            <!-- リング -->
             <div class="tab-pane fade show active" id="ring" role="tabpanel" aria-labelledby="ring-tab">
-                <p><strong>保有チップ:</strong> ○○点</p>
+                <p>
+                    <strong>保有リングチップ:</strong><br>
+                    通常: <strong>{{ number_format($ringChips) }} 点</strong><br>
+                    0円システム: {{ number_format($unsettledZeroChips) }} 点<br>
+                    合計: <strong>{{ number_format($totalRingChips) }} 点</strong>
+                </p>
+                <!-- リング：引き出し -->
+                <form method="POST" action="{{ route('players.ring.withdraw', $player) }}">
+                    @csrf
+                    <div class="mb-2">
+                        <label>引き出し額</label>
+                        <input type="number" name="withdraw_amount" class="form-control" required>
+                        @error('withdraw_amount')
+                        <div class="text-danger">{{ $message }}</div>
+                        @enderror
+                    </div>
+                    <div class="mb-2">
+                        <label>コメント</label>
+                        <textarea name="withdraw_comment" class="form-control"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary mt-2" {{ $player->hasUnsettledZeroSystem() ? 'disabled' : '' }}>引き出し</button>
+                </form>
 
-                <h5>cash-in</h5>
-                <div class="mb-2">
-                    <label>引き出し額</label>
-                    <input type="text" class="form-control">
-                    <button class="btn btn-primary mt-2">ボタン</button>
-                </div>
+                <!-- リング：0円システム -->
+                <form method="POST" action="{{ route('players.zero-system.store', $player) }}">
+                    @csrf
+                    <div class="mb-2">
+                        <label>0円システム額</label>
+                        <input type="number" name="zero_amount" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn btn-warning mt-2">0円システム追加</button>
+                </form>
 
-                <div class="mb-2">
-                    <label>0円システム</label>
-                    <input type="text" class="form-control">
-                    <button class="btn btn-primary mt-2">ボタン</button>
-                </div>
-
-                <h5>cash-out</h5>
-                <div class="mb-2">
-                    <label>アウト額</label>
-                    <input type="text" class="form-control">
-                    <button class="btn btn-primary mt-2">ボタン</button>
-                </div>
-
-                <div class="mb-2">
-                    <label>コメント入力</label>
-                    <textarea class="form-control"></textarea>
-                </div>
-
-                <a href="{{ route('players.history', ['player' => $player->id, 'tab' => 'ring']) }}" class="btn btn-secondary mt-2">
-                    リング履歴を見る
-                </a>
+                <!-- リング：Cash-out -->
+                <form method="POST" action="{{ route('players.ring.cashout', $player) }}">
+                    @csrf
+                    <div class="mb-2">
+                        <label>アウト額</label>
+                        <input type="number" name="cashout_amount" class="form-control" required>
+                    </div>
+                    <div class="mb-2">
+                        <label>コメント</label>
+                        <textarea name="cashout_comment" class="form-control"></textarea>
+                    </div>
+                    <div class="flex gap-2">
+                        <button type="submit" class="btn btn-success">Cash-out</button>
+                        <a href="{{ route('players.ring.settle', $player) }}" class="btn btn-secondary">精算</a>
+                    </div>
+                </form>
             </div>
 
-            <!--  トナメ -->
+            <!-- トナメ -->
             <div class="tab-pane fade" id="tournament" role="tabpanel" aria-labelledby="tournament-tab">
                 <form method="POST" action="{{ route('players.tournament.store', $player) }}">
                     @csrf
                     <p><strong>保有トナメチップ:</strong> {{ number_format($tournamentChips) }} 点</p>
+
                     <div class="mb-2">
                         <label>チップ</label>
-                        <!-- 表示用（ユーザーが見る/入力する） -->
                         <input type="text" id="chips_view" class="form-control" inputmode="numeric">
-
-                        <!-- 実際に送信される値（hidden） -->
                         <input type="hidden" name="chips" id="chips_real">
                     </div>
 

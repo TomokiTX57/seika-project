@@ -7,5 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class ZeroSystemDetail extends Model
 {
-    use HasFactory;
+    protected $fillable = [
+        'zero_system_header_id',
+        'initial_chips',
+    ];
+
+    public function header()
+    {
+        return $this->belongsTo(ZeroSystemHeader::class, 'zero_system_header_id');
+    }
 }

@@ -33,6 +33,11 @@ Route::get('/tournaments', [TournamentController::class, 'index'])->name('tourna
 Route::get('/tournaments/{tournament}/edit', [TournamentController::class, 'edit'])->name('tournaments.edit');
 Route::put('/tournaments/{tournament}', [TournamentController::class, 'update'])->name('tournaments.update');
 Route::get('/subscribed-players', [PlayerController::class, 'subscribed'])->name('players.subscribed');
+Route::post('/players/{player}/ring/withdraw', [PlayerController::class, 'withdrawRing'])->name('players.ring.withdraw');
+Route::post('/players/{player}/ring/cashout', [PlayerController::class, 'cashoutRing'])->name('players.ring.cashout');
+Route::get('/players/{player}/ring/settle', [PlayerController::class, 'settleRing'])->name('players.ring.settle');
+
+Route::post('/players/{player}/zero-system', [PlayerController::class, 'storeZeroSystem'])->name('players.zero-system.store');
 
 
 Route::get('/dashboard', function () {

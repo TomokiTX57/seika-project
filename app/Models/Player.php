@@ -20,11 +20,18 @@ class Player extends Model
     public function tournamentTransactions()
     {
         return $this->hasMany(TournamentTransaction::class);
-        return $this->hasMany(\App\Models\TournamentTransaction::class);
     }
 
     public function ringTransactions()
     {
         return $this->hasMany(RingTransaction::class);
+    }
+
+    public function hasUnsettledZeroSystem(): bool
+    {
+        return \App\Models\ZeroSystemHeader::where('player_id', $this->id)
+            ->whereDate('created_at', now()->toDateString())
+            ->whereNull('final_chips')
+            ->exists();
     }
 }
