@@ -44,10 +44,22 @@
                         @foreach ($player->ringTransactions->sortByDesc('created_at') as $tx)
                         <tr>
                             <td>{{ $tx->created_at->format('Y-m-d H:i') }}</td>
-                            <td>{{ $tx->chips }}</td>
+                            <td>
+                                @if ($tx->is_zero_system && $tx->chips === 0 && $tx->zeroSystemHeader)
+                                {{ $tx->zeroSystemHeader->details->sum('initial_chips') }}
+                                @else
+                                {{ $tx->chips }}
+                                @endif
+                            </td>
                             <!-- <td>{{ $tx->is_zero_system ? '0円システム' : '引き出し' }}</td> -->
                             <td>{{ $tx->accounting_number }}</td>
-                            <td>{{ $tx->comment }}</td>
+                            <td>
+                                @if ($tx->is_zero_system && $tx->chips === 0 && $tx->zeroSystemHeader)
+                                0円システム in
+                                @else
+                                {{ $tx->comment }}
+                                @endif
+                            </td>
                         </tr>
                         @endforeach
                     </tbody>

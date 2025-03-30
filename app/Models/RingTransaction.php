@@ -17,4 +17,9 @@ class RingTransaction extends Model
         'accounting_number',
         'comment',
     ];
+
+    public function zeroSystemHeader()
+    {
+        return $this->hasOne(ZeroSystemHeader::class);
+    }
 }

@@ -160,9 +160,15 @@ class PlayerController extends Controller
     {
         $tab = $request->query('tab', 'tournament'); // デフォルトで "tournament"
 
+        $ringTransactions = \App\Models\RingTransaction::where('player_id', $player->id)
+            ->orderBy('created_at', 'desc')
+            ->with('zeroSystemHeader.details')
+            ->get();
+
         return view('players.history', [
             'player' => $player,
             'tab' => $tab,
+            'ringTransactions' => $ringTransactions, // ←ビューで使用するため追加
         ]);
     }
 
