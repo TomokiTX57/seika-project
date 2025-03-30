@@ -41,23 +41,31 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach ($player->ringTransactions->sortByDesc('created_at') as $tx)
+                        @foreach ($ringTransactions as $tx)
                         <tr>
                             <td>{{ $tx->created_at->format('Y-m-d H:i') }}</td>
                             <td>
                                 @if ($tx->is_zero_system && $tx->chips === 0 && $tx->zeroSystemHeader)
+                                {{-- 0円システム in の表示（詳細から合計チップを取得） --}}
                                 {{ $tx->zeroSystemHeader->details->sum('initial_chips') }}
                                 @else
                                 {{ $tx->chips }}
                                 @endif
                             </td>
-                            <!-- <td>{{ $tx->is_zero_system ? '0円システム' : '引き出し' }}</td> -->
                             <td>{{ $tx->accounting_number }}</td>
                             <td>
-                                @if ($tx->is_zero_system && $tx->chips === 0 && $tx->zeroSystemHeader)
+                                @if ($tx->is_zero_system)
+                                @if ($tx->chips === 0 && $tx->zeroSystemHeader)
                                 0円システム in
+                                @elseif ($tx->comment === '0システム')
+                                0円システム 清算
+                                @elseif ($tx->chips > 0)
+                                0円システム out
                                 @else
-                                {{ $tx->comment }}
+                                {{ $tx->comment ?: '0円システム' }}
+                                @endif
+                                @else
+                                {{ $tx->comment ?: '引き出し' }}
                                 @endif
                             </td>
                         </tr>

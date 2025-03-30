@@ -319,7 +319,6 @@ class PlayerController extends Controller
             return back()->with('error', '精算処理でエラーが発生しました: ' . $e->getMessage());
         }
     }
-
     public function cashoutRing(Request $request, Player $player)
     {
         $request->validate([
@@ -336,21 +335,27 @@ class PlayerController extends Controller
             ->first();
 
         if ($header) {
-            // 0円システムとして精算（final_chips を更新）
+            // final_chips を更新
             $header->final_chips = $request->cashout_amount;
             $header->save();
-        } else {
-            // 通常のキャッシュアウト処理（ring_transactions に記録）
-            $ringTransaction = RingTransaction::create([
+
+            // RingTransaction にも記録（0円システム out として履歴に表示）
+            RingTransaction::create([
                 'player_id' => $player->id,
                 'store_id' => auth()->id(),
-                'chips' => $request->cashout_amount, // 通常はプラス
+                'chips' => $request->cashout_amount,
+                'is_zero_system' => true,
+                'comment' => '0円システム out',
+            ]);
+        } else {
+            // 通常のキャッシュアウト処理
+            RingTransaction::create([
+                'player_id' => $player->id,
+                'store_id' => auth()->id(),
+                'chips' => $request->cashout_amount,
                 'is_zero_system' => false,
-                'accounting_number' => null,
                 'comment' => $request->cashout_comment,
             ]);
-
-            \Log::info('リングトランザクション作成:', ['id' => $ringTransaction->id]);
         }
 
         return redirect()->route('players.show', $player)->with('success', 'Cash-outが完了しました');
