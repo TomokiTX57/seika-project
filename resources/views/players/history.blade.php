@@ -35,7 +35,8 @@
                         <tr>
                             <th>日付</th>
                             <th>チップ</th>
-                            <!-- <th>種別</th> -->
+                            <th>種別</th>
+                            <th>処理</th>
                             <th>会計番号</th>
                             <th>コメント</th>
                         </tr>
@@ -45,28 +46,18 @@
                         <tr>
                             <td>{{ $tx->created_at->format('Y-m-d H:i') }}</td>
                             <td>
-                                @if ($tx->is_zero_system && $tx->chips === 0 && $tx->zeroSystemHeader)
-                                {{-- 0円システム in の表示（詳細から合計チップを取得） --}}
+                                @if ($tx->type === '0円システム' && $tx->action === 'in' && $tx->zeroSystemHeader && $tx->zeroSystemHeader->details)
                                 {{ $tx->zeroSystemHeader->details->sum('initial_chips') }}
                                 @else
                                 {{ $tx->chips }}
                                 @endif
                             </td>
+
+                            <td>{{ $tx->type }}</td>
+                            <td>{{ $tx->action }}</td>
                             <td>{{ $tx->accounting_number }}</td>
                             <td>
-                                @if ($tx->is_zero_system)
-                                @if ($tx->chips === 0 && $tx->zeroSystemHeader)
-                                0円システム in
-                                @elseif ($tx->comment === '0システム')
-                                0円システム 清算
-                                @elseif ($tx->chips > 0)
-                                0円システム out
-                                @else
-                                {{ $tx->comment ?: '0円システム' }}
-                                @endif
-                                @else
-                                {{ $tx->comment ?: '引き出し' }}
-                                @endif
+                                {{ $tx->comment }}
                             </td>
                         </tr>
                         @endforeach

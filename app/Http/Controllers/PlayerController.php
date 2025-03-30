@@ -204,8 +204,10 @@ class PlayerController extends Controller
             'player_id' => $player->id,
             'store_id' => Auth::id(),
             'chips' => -abs((int)$request->withdraw_amount),
-            'comment' => $request->withdraw_comment,
             'is_zero_system' => false,
+            'type' => '引き出し',
+            'action' => 'in',
+            'comment' => $request->withdraw_comment ?: null,
         ]);
 
         return redirect()->route('players.show', $player)->with('success', '引き出し処理が完了しました');
@@ -221,13 +223,14 @@ class PlayerController extends Controller
         DB::beginTransaction();
 
         try {
-            // 1. まず RingTransaction を作成
             $ringTransaction = RingTransaction::create([
                 'player_id' => $player->id,
                 'store_id' => Auth::id(),
                 'chips' => 0,
                 'is_zero_system' => true,
-                'comment' => '0円システム仮記録',
+                'type' => '0円システム',
+                'action' => 'in',
+                'comment' => null,
             ]);
 
             \Log::info('RingTransaction 作成済み', ['id' => $ringTransaction->id]);
@@ -280,45 +283,51 @@ class PlayerController extends Controller
 
         try {
             $today = now()->toDateString();
-            // 該当ヘッダーを取得（まだ精算されていないもの）
-            $header = ZeroSystemHeader::where('player_id', $player->id)
-                ->whereDate('created_at', now()->toDateString())
+
+            // 未清算で final_chips が入っているヘッダーをすべて取得
+            $headers = ZeroSystemHeader::where('player_id', $player->id)
+                ->whereDate('created_at', $today)
                 ->whereNotNull('final_chips')
                 ->where('is_settled', false)
-                ->first();
+                ->get();
 
-            if (!$header) {
+            if ($headers->isEmpty()) {
                 return back()->with('error', '精算対象が見つかりません。');
             }
 
-            // header に紐づく明細だけを見るように変更
-            $initialTotal = ZeroSystemDetail::where('zero_system_header_id', $header->id)
-                ->sum(DB::raw('ABS(initial_chips)'));
+            foreach ($headers as $header) {
+                // 対象ヘッダーに紐づく明細の初期チップ合計
+                $initialTotal = ZeroSystemDetail::where('zero_system_header_id', $header->id)
+                    ->sum(DB::raw('ABS(initial_chips)'));
 
-            $finalChips = $header->final_chips;
-            $diff = $finalChips - $initialTotal;
+                $finalChips = $header->final_chips;
+                $diff = $finalChips - $initialTotal;
 
-            if ($diff !== 0) {
-                \App\Models\RingTransaction::create([
-                    'player_id' => $player->id,
-                    'store_id' => auth()->id(),
-                    'chips' => $diff,
-                    'is_zero_system' => true,
-                    'comment' => '0システム',
-                ]);
+                if ($diff !== 0) {
+                    RingTransaction::create([
+                        'player_id' => $player->id,
+                        'store_id' => auth()->id(),
+                        'chips' => $diff,
+                        'is_zero_system' => true,
+                        'type' => '0円システム',
+                        'action' => '清算',
+                        'comment' => null, // コメントは純粋にユーザー入力のみ
+                    ]);
+                }
+
+                $header->is_settled = true;
+                $header->save();
             }
 
-            //  is_settled を true にする
-            $header->is_settled = true;
-            $header->save();
-
             DB::commit();
-            return redirect()->route('players.show', $player)->with('success', '精算が完了しました');
+
+            return redirect()->route('players.show', $player)->with('success', '未清算分をすべて精算しました');
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->with('error', '精算処理でエラーが発生しました: ' . $e->getMessage());
         }
     }
+
     public function cashoutRing(Request $request, Player $player)
     {
         $request->validate([
@@ -345,7 +354,9 @@ class PlayerController extends Controller
                 'store_id' => auth()->id(),
                 'chips' => $request->cashout_amount,
                 'is_zero_system' => true,
-                'comment' => '0円システム out',
+                'type' => '0円システム',
+                'action' => 'out',
+                'comment' => null,
             ]);
         } else {
             // 通常のキャッシュアウト処理
@@ -354,6 +365,8 @@ class PlayerController extends Controller
                 'store_id' => auth()->id(),
                 'chips' => $request->cashout_amount,
                 'is_zero_system' => false,
+                'type' => '引き出し',
+                'action' => 'out',
                 'comment' => $request->cashout_comment,
             ]);
         }

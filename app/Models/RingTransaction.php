@@ -14,6 +14,8 @@ class RingTransaction extends Model
         'store_id',
         'chips',
         'is_zero_system',
+        'type',
+        'action',
         'accounting_number',
         'comment',
     ];
