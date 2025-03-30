@@ -34,4 +34,16 @@ class Player extends Model
             ->whereNull('final_chips')
             ->exists();
     }
+
+    public function getTotalRingChipsAttribute()
+    {
+        $base = $this->ringTransactions()->sum('chips');
+        $zero = ZeroSystemDetail::whereHas('header', function ($query) {
+            $query->where('player_id', $this->id)
+                ->whereDate('created_at', now()->toDateString())
+                ->whereNull('final_chips');
+        })->sum('initial_chips');
+
+        return $base + $zero;
+    }
 }

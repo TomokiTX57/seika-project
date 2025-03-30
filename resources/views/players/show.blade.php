@@ -66,10 +66,10 @@
             <!-- リング -->
             <div class="tab-pane fade show active" id="ring" role="tabpanel" aria-labelledby="ring-tab">
                 <p>
-                    <strong>保有リングチップ:</strong><br>
-                    通常: <strong>{{ number_format($ringChips) }} 点</strong><br>
+                    <strong>保有リングチップ: {{ number_format($ringChips) }} 点</strong><br>
+                    <!-- 通常: <strong>{{ number_format($ringChips) }} 点</strong><br> -->
                     0円システム: {{ number_format($unsettledZeroChips) }} 点<br>
-                    合計: <strong>{{ number_format($totalRingChips) }} 点</strong>
+                    <!-- 合計: <strong>{{ number_format($player->total_ring_chips) }} 点</strong> -->
                 </p>
                 <!-- 引き出しフォーム -->
                 <form method="POST" action="{{ route('players.ring.withdraw', $player) }}">
@@ -118,7 +118,15 @@
                     </div>
                     <div class="flex gap-2">
                         <button type="submit" class="btn btn-success">Cash-out</button>
-                        <a href="{{ route('players.ring.settle', $player) }}" class="btn btn-secondary">精算</a>
+
+                        <a href="{{ route('players.ring.settle', $player) }}"
+                            class="btn btn-secondary {{ !$shouldSettle ? 'disabled pointer-events-none opacity-50' : '' }}">
+                            精算
+                        </a>
+
+                        @if (!$shouldSettle)
+                        <div class="text-sm text-gray-500 mt-1">清算が不要、または既に完了しています。</div>
+                        @endif
                     </div>
                 </form>
 

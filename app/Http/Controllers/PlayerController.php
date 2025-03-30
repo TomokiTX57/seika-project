@@ -55,13 +55,20 @@ class PlayerController extends Controller
         // 利用状態（表示用）
         $chipStatus = $player->hasUnsettledZeroSystem() ? '0円システム利用中' : '通常チップ利用中';
 
+        $shouldSettle = \App\Models\ZeroSystemHeader::where('player_id', $player->id)
+            ->whereDate('created_at', now()->toDateString())
+            ->whereNotNull('final_chips')       // ← cashout 済み
+            ->where('is_settled', false)        // ← まだ精算してない
+            ->exists();
+
         return view('players.show', compact(
             'player',
             'tournamentChips',
             'ringChips',
             'unsettledZeroChips',
             'totalRingChips',
-            'chipStatus'
+            'chipStatus',
+            'shouldSettle'
         ));
     }
 
@@ -267,25 +274,26 @@ class PlayerController extends Controller
 
         try {
             $today = now()->toDateString();
-
-            // 該当ヘッダーを取得（当日の、final_chips が埋まっているもの）
+            // 該当ヘッダーを取得（まだ精算されていないもの）
             $header = ZeroSystemHeader::where('player_id', $player->id)
-                ->whereDate('created_at', $today)
+                ->whereDate('created_at', now()->toDateString())
                 ->whereNotNull('final_chips')
+                ->where('is_settled', false)
                 ->first();
 
             if (!$header) {
-                return redirect()->back()->with('error', '精算対象が見つかりません。');
+                return back()->with('error', '精算対象が見つかりません。');
             }
 
-            // ZeroSystemDetail にある初期チップの合計を取得（絶対値で計算）
-            $initialTotal = $header->details()->sum(DB::raw('ABS(initial_chips)'));
-            $finalChips = $header->final_chips;
+            // header に紐づく明細だけを見るように変更
+            $initialTotal = ZeroSystemDetail::where('zero_system_header_id', $header->id)
+                ->sum(DB::raw('ABS(initial_chips)'));
 
+            $finalChips = $header->final_chips;
             $diff = $finalChips - $initialTotal;
 
             if ($diff !== 0) {
-                RingTransaction::create([
+                \App\Models\RingTransaction::create([
                     'player_id' => $player->id,
                     'store_id' => auth()->id(),
                     'chips' => $diff,
@@ -293,6 +301,10 @@ class PlayerController extends Controller
                     'comment' => '0システム',
                 ]);
             }
+
+            //  is_settled を true にする
+            $header->is_settled = true;
+            $header->save();
 
             DB::commit();
             return redirect()->route('players.show', $player)->with('success', '精算が完了しました');
@@ -323,7 +335,7 @@ class PlayerController extends Controller
             $header->save();
         } else {
             // 通常のキャッシュアウト処理（ring_transactions に記録）
-            RingTransaction::create([
+            $ringTransaction = RingTransaction::create([
                 'player_id' => $player->id,
                 'store_id' => auth()->id(),
                 'chips' => $request->cashout_amount, // 通常はプラス
