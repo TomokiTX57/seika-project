@@ -40,6 +40,9 @@ Route::get('/players/{player}/ring/settle', [PlayerController::class, 'settleRin
 
 Route::post('/players/{player}/zero-system', [PlayerController::class, 'storeZeroSystem'])->name('players.zero-system.store');
 
+Route::get('/zero-system-users', [PlayerController::class, 'zeroSystemUsers'])->name('zero-system.users');
+Route::get('/zero-system/edit/{player}', [PlayerController::class, 'editZeroSystem'])->name('zero-system.edit');
+
 
 Route::get('/dashboard', function () {
     return view('dashboard');

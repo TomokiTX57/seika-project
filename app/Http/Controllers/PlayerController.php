@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\DB;
 
 class PlayerController extends Controller
 {
+    // プレイヤー一覧
     public function index()
     {
         $players = Player::orderBy('created_at', 'asc')->get();
@@ -38,6 +39,7 @@ class PlayerController extends Controller
         return response()->json($players);
     }
 
+    // プレイヤーの詳細画面
     public function show(Player $player)
     {
         $tournamentChips = $player->tournamentTransactions()->sum('chips');
@@ -72,11 +74,13 @@ class PlayerController extends Controller
         ));
     }
 
+    // プレイヤーの新規作成画面
     public function create()
     {
         return view('players.create');
     }
 
+    // プレイヤーの新規作成
     public function store(Request $request)
     {
         $request->validate([
@@ -103,6 +107,7 @@ class PlayerController extends Controller
         return view('players.edit', compact('player'));
     }
 
+    // プレイヤー情報の更新
     public function update(Request $request, Player $player)
     {
         $request->validate([
@@ -124,6 +129,7 @@ class PlayerController extends Controller
         return redirect()->route('players.show', $player)->with('success', 'プレイヤー情報を更新しました');
     }
 
+    //トナメの取引を保存
     public function storeTournamentTransaction(Request $request, Player $player)
     {
         //デバッグ用のログ
@@ -172,6 +178,7 @@ class PlayerController extends Controller
         ]);
     }
 
+    //サブスク
     public function subscribed()
     {
         $players = Player::where('is_subscribed', true)->orderBy('player_name')->get();
@@ -212,6 +219,8 @@ class PlayerController extends Controller
 
         return redirect()->route('players.show', $player)->with('success', '引き出し処理が完了しました');
     }
+
+    // 0円システムのcashin
     public function storeZeroSystem(Request $request, Player $player)
     {
         $request->validate([
@@ -276,7 +285,7 @@ class PlayerController extends Controller
         }
     }
 
-
+    // 0円システムの精算
     public function settleRing(Player $player)
     {
         DB::beginTransaction();
@@ -328,6 +337,7 @@ class PlayerController extends Controller
         }
     }
 
+    // 引き出しのcashout
     public function cashoutRing(Request $request, Player $player)
     {
         $request->validate([
@@ -372,5 +382,31 @@ class PlayerController extends Controller
         }
 
         return redirect()->route('players.show', $player)->with('success', 'Cash-outが完了しました');
+    }
+
+    // 0円システムを利用しているプレイヤー一覧
+    public function zeroSystemUsers()
+    {
+        $today = now()->toDateString();
+
+        // 本日中に0円システムを利用しているプレイヤー一覧を取得
+        $headers = ZeroSystemHeader::with(['player'])
+            ->whereDate('created_at', $today)
+            ->get();
+
+        return view('zero_systems.users', compact('headers'));
+    }
+
+    // 0円システムプレイヤー一覧の編集画面
+    public function editZeroSystem(Player $player)
+    {
+        $today = now()->toDateString();
+
+        $header = ZeroSystemHeader::where('player_id', $player->id)
+            ->whereDate('created_at', $today)
+            ->whereNull('is_settled') // 精算前
+            ->first();
+
+        return view('zero_systems.edit', compact('player', 'header'));
     }
 }

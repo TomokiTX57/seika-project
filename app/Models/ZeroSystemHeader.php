@@ -9,7 +9,18 @@ class ZeroSystemHeader extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['player_id', 'store_id', 'ring_transaction_id', 'final_chips'];
+    protected $fillable = [
+        'player_id',
+        'store_id',
+        'ring_transaction_id',
+        'final_chips',
+        'is_settled',
+    ];
+
+    public function player()
+    {
+        return $this->belongsTo(Player::class);
+    }
 
     public function details()
     {
