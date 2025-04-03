@@ -43,23 +43,7 @@
                     </thead>
                     <tbody>
                         @foreach ($ringTransactions as $tx)
-                        <tr>
-                            <td>{{ $tx->created_at->format('Y-m-d H:i') }}</td>
-                            <td>
-                                @if ($tx->type === '0円システム' && $tx->action === 'in' && $tx->zeroSystemHeader && $tx->zeroSystemHeader->details)
-                                {{ $tx->zeroSystemHeader->details->sum('initial_chips') }}
-                                @else
-                                {{ $tx->chips }}
-                                @endif
-                            </td>
-
-                            <td>{{ $tx->type }}</td>
-                            <td>{{ $tx->action }}</td>
-                            <td>{{ $tx->accounting_number }}</td>
-                            <td>
-                                {{ $tx->comment }}
-                            </td>
-                        </tr>
+                        @include('components.transaction-row', ['tx' => $tx])
                         @endforeach
                     </tbody>
                 </table>
@@ -100,4 +84,6 @@
             @endif
         </div>
     </div>
+
+    @vite(['resources/js/history-action.js'])
 </x-app-layout>
