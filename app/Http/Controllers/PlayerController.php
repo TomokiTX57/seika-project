@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 use App\Models\Player;
 use App\Models\TournamentTransaction;
 use Illuminate\Support\Facades\Auth;
@@ -11,7 +12,6 @@ use App\Models\ZeroSystemHeader;
 use App\Models\ZeroSystemDetail;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
-
 
 class PlayerController extends Controller
 {
@@ -467,5 +467,23 @@ class PlayerController extends Controller
             'chipDifference',
             'ringTransactions' // ←ここを修正
         ));
+    }
+
+    // RingTransaction 更新処理
+    public function updateRingTransaction(Request $request, $id): JsonResponse
+    {
+        $tx = \App\Models\RingTransaction::findOrFail($id);
+        $tx->chips = $request->chips;
+        $tx->comment = $request->comment;
+        $tx->save();
+
+        return response()->json(['message' => '更新完了']);
+    }
+
+    // RingTransaction 削除処理
+    public function deleteRingTransaction($id): JsonResponse
+    {
+        \App\Models\RingTransaction::destroy($id);
+        return response()->json(['message' => '削除完了']);
     }
 }

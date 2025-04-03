@@ -55,6 +55,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/zero-system/edit/{player}', [PlayerController::class, 'editZeroSystem'])->name('zero-system.edit');
     Route::post('/players/{player}/tournament-transactions', [PlayerController::class, 'storeTournamentTransaction'])->name('players.tournament.store');
     Route::get('/zero-system/checkout/{player}', [PlayerController::class, 'checkoutZeroSystem'])->name('zero-system.checkout');
+
+    Route::put('/ring-transactions/{id}', [PlayerController::class, 'updateRingTransaction']);
+    Route::delete('/ring-transactions/{id}', [PlayerController::class, 'deleteRingTransaction']);
 });
 
 require __DIR__ . '/auth.php';
