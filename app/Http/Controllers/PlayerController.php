@@ -354,7 +354,7 @@ class PlayerController extends Controller
     public function cashoutRing(Request $request, Player $player)
     {
         $request->validate([
-            'cashout_amount' => 'required|integer|min:1',
+            'cashout_amount' => 'required|integer|min:0',
             'cashout_comment' => 'nullable|string|max:1000',
         ]);
 
