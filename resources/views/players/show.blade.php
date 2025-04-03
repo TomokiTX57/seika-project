@@ -37,16 +37,6 @@
             {{ $chipStatus }}
         </div>
 
-        <!-- QRコード -->
-        <div class="mt-4 p-4 border rounded bg-gray-50">
-            <strong>QRコード</strong>
-            @if ($player->uid)
-            <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={{ $player->uid }}" alt="QR Code">
-            @else
-            <p class="text-red-500 font-bold">uidを更新してください</p>
-            @endif
-        </div>
-
         <!--  Bootstrap ナビゲーションタブ -->
         <ul class="nav nav-tabs mt-4" id="playerTabs" role="tablist">
             <li class="nav-item" role="presentation">
@@ -71,8 +61,14 @@
                     0円システム: {{ number_format($unsettledZeroChips) }} 点<br>
                     <!-- 合計: <strong>{{ number_format($player->total_ring_chips) }} 点</strong> -->
                 </p>
+
+                <div class="mb-2">
+                    <label>会計番号</label>
+                    <input type="text" name="accounting_number" class="form-control" form="withdraw-form">
+                </div>
+
                 <!-- 引き出しフォーム -->
-                <form method="POST" action="{{ route('players.ring.withdraw', $player) }}">
+                <form method="POST" action="{{ route('players.ring.withdraw', $player) }}" id="withdraw-form">
                     @csrf
                     <div class="mb-2">
                         <label>引き出し額</label>
@@ -82,11 +78,7 @@
                         <label>コメント</label>
                         <textarea name="withdraw_comment" class="form-control"></textarea>
                     </div>
-
-                    <button type="submit" class="btn btn-primary mt-2"
-                        {{ $player->hasUnsettledZeroSystem() ? 'disabled' : '' }}>
-                        引き出し
-                    </button>
+                    <button type="submit" class="btn btn-primary mt-2" {{ $player->hasUnsettledZeroSystem() ? 'disabled' : '' }}>引き出し</button>
                 </form>
 
                 @if ($player->hasUnsettledZeroSystem())
@@ -98,6 +90,10 @@
                 <!-- リング：0円システム -->
                 <form method="POST" action="{{ route('players.zero-system.store', $player) }}">
                     @csrf
+                    <div class="mb-2">
+                        <label>会計番号</label>
+                        <input type="text" name="accounting_number" class="form-control">
+                    </div>
                     <div class="mb-2">
                         <label>0円システム額</label>
                         <input type="number" name="zero_amount" class="form-control" required>
@@ -174,5 +170,15 @@
                     トナメ履歴を見る
                 </a>
             </div>
+        </div>
+
+        <!-- QRコード -->
+        <div class="mt-4 p-4 border rounded bg-gray-50">
+            <strong>QRコード</strong>
+            @if ($player->uid)
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={{ $player->uid }}" alt="QR Code">
+            @else
+            <p class="text-red-500 font-bold">uidを更新してください</p>
+            @endif
         </div>
 </x-app-layout>

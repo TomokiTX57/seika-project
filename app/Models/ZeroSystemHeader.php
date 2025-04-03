@@ -26,4 +26,9 @@ class ZeroSystemHeader extends Model
     {
         return $this->hasMany(ZeroSystemDetail::class, 'zero_system_header_id');
     }
+
+    public function ringTransaction()
+    {
+        return $this->belongsTo(\App\Models\RingTransaction::class);
+    }
 }

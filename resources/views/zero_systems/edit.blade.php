@@ -7,7 +7,7 @@
 
     <div class="p-6 bg-white max-w-3xl mx-auto rounded shadow">
         <div class="mb-4">
-            <strong>会計番号:</strong> {{ $player->player_my_id ?? '未設定' }}
+            <strong>会計番号:</strong> {{ $latestAccountingNumber ?? '未設定' }}
         </div>
 
         <!-- Cash in フォーム -->

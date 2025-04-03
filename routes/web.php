@@ -21,27 +21,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/players', [PlayerController::class, 'index'])->name('players.index');
-Route::get('/players/create', [PlayerController::class, 'create'])->name('players.create');
-Route::get('/players/search', [PlayerController::class, 'search'])->name('players.search');
-Route::get('/players/{player}', [PlayerController::class, 'show'])->name('players.show');
-Route::post('/players', [PlayerController::class, 'store'])->name('players.store');
-Route::get('/players/{player}/edit', [PlayerController::class, 'edit'])->name('players.edit');
-Route::put('/players/{player}', [PlayerController::class, 'update'])->name('players.update');
-Route::post('/players/{player}/tournament-transactions', [PlayerController::class, 'storeTournamentTransaction'])->name('players.tournament.store');
-Route::get('/players/{player}/history', [PlayerController::class, 'history'])->name('players.history');
-Route::get('/tournaments', [TournamentController::class, 'index'])->name('tournaments.index');
-Route::get('/tournaments/{tournament}/edit', [TournamentController::class, 'edit'])->name('tournaments.edit');
-Route::put('/tournaments/{tournament}', [TournamentController::class, 'update'])->name('tournaments.update');
-Route::get('/subscribed-players', [PlayerController::class, 'subscribed'])->name('players.subscribed');
-Route::post('/players/{player}/ring/withdraw', [PlayerController::class, 'withdrawRing'])->name('players.ring.withdraw');
-Route::post('/players/{player}/ring/cashout', [PlayerController::class, 'cashoutRing'])->name('players.ring.cashout');
-Route::get('/players/{player}/ring/settle', [PlayerController::class, 'settleRing'])->name('players.ring.settle');
 
-Route::post('/players/{player}/zero-system', [PlayerController::class, 'storeZeroSystem'])->name('players.zero-system.store');
-
-Route::get('/zero-system-users', [PlayerController::class, 'zeroSystemUsers'])->name('zero-system.users');
-Route::get('/zero-system/edit/{player}', [PlayerController::class, 'editZeroSystem'])->name('zero-system.edit');
 
 
 Route::get('/dashboard', function () {
@@ -52,7 +32,29 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::get('/players', [PlayerController::class, 'index'])->name('players.index');
+    Route::get('/players/create', [PlayerController::class, 'create'])->name('players.create');
+    Route::get('/players/search', [PlayerController::class, 'search'])->name('players.search');
+    Route::get('/players/{player}', [PlayerController::class, 'show'])->name('players.show');
+    Route::post('/players', [PlayerController::class, 'store'])->name('players.store');
+    Route::get('/players/{player}/edit', [PlayerController::class, 'edit'])->name('players.edit');
+    Route::put('/players/{player}', [PlayerController::class, 'update'])->name('players.update');
     Route::post('/players/{player}/tournament-transactions', [PlayerController::class, 'storeTournamentTransaction'])->name('players.tournament.store');
+    Route::get('/players/{player}/history', [PlayerController::class, 'history'])->name('players.history');
+    Route::get('/tournaments', [TournamentController::class, 'index'])->name('tournaments.index');
+    Route::get('/tournaments/{tournament}/edit', [TournamentController::class, 'edit'])->name('tournaments.edit');
+    Route::put('/tournaments/{tournament}', [TournamentController::class, 'update'])->name('tournaments.update');
+    Route::get('/subscribed-players', [PlayerController::class, 'subscribed'])->name('players.subscribed');
+    Route::post('/players/{player}/ring/withdraw', [PlayerController::class, 'withdrawRing'])->name('players.ring.withdraw');
+    Route::post('/players/{player}/ring/cashout', [PlayerController::class, 'cashoutRing'])->name('players.ring.cashout');
+    Route::get('/players/{player}/ring/settle', [PlayerController::class, 'settleRing'])->name('players.ring.settle');
+
+    Route::post('/players/{player}/zero-system', [PlayerController::class, 'storeZeroSystem'])->name('players.zero-system.store');
+
+    Route::get('/zero-system-users', [PlayerController::class, 'zeroSystemUsers'])->name('zero-system.users');
+    Route::get('/zero-system/edit/{player}', [PlayerController::class, 'editZeroSystem'])->name('zero-system.edit');
+    Route::post('/players/{player}/tournament-transactions', [PlayerController::class, 'storeTournamentTransaction'])->name('players.tournament.store');
+    Route::get('/zero-system/checkout/{player}', [PlayerController::class, 'checkoutZeroSystem'])->name('zero-system.checkout');
 });
 
 require __DIR__ . '/auth.php';

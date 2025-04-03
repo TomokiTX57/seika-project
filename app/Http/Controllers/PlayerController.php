@@ -42,6 +42,16 @@ class PlayerController extends Controller
     // プレイヤーの詳細画面
     public function show(Player $player)
     {
+
+        $latestRingTx = $player->ringTransactions()
+            ->whereDate('created_at', now()->toDateString())
+            ->where('type', '0円システム')
+            ->where('action', 'in')
+            ->whereNotNull('accounting_number')
+            ->orderByDesc('created_at')
+            ->first();
+
+        $latestAccountingNumber = $latestRingTx?->accounting_number;
         $tournamentChips = $player->tournamentTransactions()->sum('chips');
         $ringChips = $player->ringTransactions()->sum('chips');
 
@@ -70,7 +80,8 @@ class PlayerController extends Controller
             'unsettledZeroChips',
             'totalRingChips',
             'chipStatus',
-            'shouldSettle'
+            'shouldSettle',
+            'latestAccountingNumber'
         ));
     }
 
@@ -215,6 +226,7 @@ class PlayerController extends Controller
             'type' => '引き出し',
             'action' => 'in',
             'comment' => $request->withdraw_comment ?: null,
+            'accounting_number' => $request->accounting_number,
         ]);
 
         return redirect()->route('players.show', $player)->with('success', '引き出し処理が完了しました');
@@ -240,6 +252,7 @@ class PlayerController extends Controller
                 'type' => '0円システム',
                 'action' => 'in',
                 'comment' => null,
+                'accounting_number' => $request->accounting_number,
             ]);
 
             \Log::info('RingTransaction 作成済み', ['id' => $ringTransaction->id]);
@@ -402,11 +415,57 @@ class PlayerController extends Controller
     {
         $today = now()->toDateString();
 
+        // header は取得しなくてもよければ省略可能（使用していなければ）
         $header = ZeroSystemHeader::where('player_id', $player->id)
             ->whereDate('created_at', $today)
-            ->whereNull('is_settled') // 精算前
+            ->whereNull('is_settled')
             ->first();
 
-        return view('zero_systems.edit', compact('player', 'header'));
+        $ringTx = $player->ringTransactions()
+            ->whereDate('created_at', $today)
+            ->whereNotNull('accounting_number')
+            ->orderByDesc('created_at')
+            ->first();
+
+        $tournamentTx = $player->tournamentTransactions()
+            ->whereDate('created_at', $today)
+            ->whereNotNull('accounting_number')
+            ->orderByDesc('created_at')
+            ->first();
+
+        $latestAccountingNumber = $ringTx->accounting_number ?? $tournamentTx->accounting_number ?? null;
+
+        return view('zero_systems.edit', compact('player', 'header', 'latestAccountingNumber'));
+    }
+
+    // 0円システムの会計画面
+    public function checkoutZeroSystem(Player $player)
+    {
+        $today = now()->toDateString();
+
+        // 当日の zero system データ
+        $headers = ZeroSystemHeader::with('details')
+            ->where('player_id', $player->id)
+            ->whereDate('created_at', $today)
+            ->get();
+
+        $totalCashIn = $headers->flatMap->details->sum('initial_chips');
+        $totalCashOut = $headers->sum('final_chips');
+        $chipDifference = $totalCashOut - $totalCashIn;
+
+        // 0円システム in の初期チップを表示させるために eager load を追加
+        $ringTransactions = RingTransaction::where('player_id', $player->id)
+            ->whereDate('created_at', $today)
+            ->with('zeroSystemHeader.details')
+            ->orderByDesc('created_at')
+            ->get();
+
+        return view('zero_systems.checkout', compact(
+            'player',
+            'totalCashIn',
+            'totalCashOut',
+            'chipDifference',
+            'ringTransactions' // ←ここを修正
+        ));
     }
 }
