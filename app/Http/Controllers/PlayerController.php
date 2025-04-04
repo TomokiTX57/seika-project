@@ -53,7 +53,15 @@ class PlayerController extends Controller
 
         $latestAccountingNumber = $latestRingTx?->accounting_number;
         $tournamentChips = $player->tournamentTransactions()->sum('chips');
-        $ringChips = $player->ringTransactions()->sum('chips');
+        $ringChips = $player->ringTransactions()
+            ->where(function ($query) {
+                $query->where('chips', '!=', 0)
+                    ->orWhere(function ($q) {
+                        $q->where('type', '!=', '0円システム')
+                            ->orWhere('action', '!=', 'in');
+                    });
+            })
+            ->sum('chips');
 
         // 未精算の0円システムチップ
         $unsettledZeroChips = \App\Models\ZeroSystemDetail::whereHas('header', function ($query) use ($player) {
@@ -177,9 +185,12 @@ class PlayerController extends Controller
     {
         $tab = $request->query('tab', 'tournament'); // デフォルトで "tournament"
 
-        $ringTransactions = \App\Models\RingTransaction::where('player_id', $player->id)
-            ->orderBy('created_at', 'desc')
-            ->with('zeroSystemHeader.details')
+        $ringTransactions = RingTransaction::where('player_id', $player->id)
+            ->whereDate('created_at', now()->toDateString())
+            ->with(['zeroSystemHeader.details' => function ($query) {
+                $query->where('initial_chips', '>', 0)->orderByDesc('created_at');
+            }])
+            ->orderByDesc('created_at')
             ->get();
 
         return view('players.history', [
@@ -244,6 +255,7 @@ class PlayerController extends Controller
         DB::beginTransaction();
 
         try {
+            // 1. 取引を作成（chips=0）
             $ringTransaction = RingTransaction::create([
                 'player_id' => $player->id,
                 'store_id' => Auth::id(),
@@ -255,16 +267,11 @@ class PlayerController extends Controller
                 'accounting_number' => $request->accounting_number,
             ]);
 
-            \Log::info('RingTransaction 作成済み', ['id' => $ringTransaction->id]);
-            \Log::info('RingTransaction 作成内容', $ringTransaction->toArray());
-
-            // 2. 未精算の ZeroSystemHeader を探す
+            // 2. 未精算のヘッダーを取得（なければ新規作成）
             $header = ZeroSystemHeader::where('player_id', $player->id)
                 ->whereDate('created_at', now()->toDateString())
                 ->whereNull('final_chips')
                 ->first();
-
-            \Log::info('ZeroSystemHeader 検索結果', ['header' => $header]);
 
             if (!$header) {
                 $header = ZeroSystemHeader::create([
@@ -273,20 +280,24 @@ class PlayerController extends Controller
                     'ring_transaction_id' => $ringTransaction->id,
                     'final_chips' => null,
                 ]);
-
-                \Log::info('新規 ZeroSystemHeader 作成', ['id' => $header->id]);
             }
 
+            // 3. 合計（未cashoutな明細のみ）を再計算
+            $existingSum = ZeroSystemDetail::where('zero_system_header_id', $header->id)->sum('initial_chips');
+            $newAmount = $request->zero_amount;
+            $newSum = $existingSum + $newAmount;
+
+            // 4. 明細を作成
             // 3. ZeroSystemDetail を作成
             ZeroSystemDetail::create([
                 'zero_system_header_id' => $header->id,
                 'initial_chips' => $request->zero_amount,
             ]);
 
-            \Log::info('ZeroSystemDetail 作成', [
-                'header_id' => $header->id,
-                'initial_chips' => $request->zero_amount,
-            ]);
+            // 5. detailsにもsum_initial_chips を保存（ビュー側で使う想定）
+            $sum = ZeroSystemDetail::where('zero_system_header_id', $header->id)->sum('initial_chips');
+            $header->sum_initial_chips = $sum;
+            $header->save();
 
             DB::commit();
 
@@ -443,7 +454,7 @@ class PlayerController extends Controller
     {
         $today = now()->toDateString();
 
-        // 当日の zero system データ
+        // 当日の zero system データ（合計集計用）
         $headers = ZeroSystemHeader::with('details')
             ->where('player_id', $player->id)
             ->whereDate('created_at', $today)
@@ -453,10 +464,12 @@ class PlayerController extends Controller
         $totalCashOut = $headers->sum('final_chips');
         $chipDifference = $totalCashOut - $totalCashIn;
 
-        // 0円システム in の初期チップを表示させるために eager load を追加
+        // RingTransaction を全件取得（chips=0 も含む）、ただし詳細もwith
         $ringTransactions = RingTransaction::where('player_id', $player->id)
-            ->whereDate('created_at', $today)
-            ->with('zeroSystemHeader.details')
+            ->whereDate('created_at', now()->toDateString())
+            ->with(['zeroSystemHeader.details' => function ($query) {
+                $query->where('initial_chips', '>', 0)->orderByDesc('created_at');
+            }])
             ->orderByDesc('created_at')
             ->get();
 
@@ -465,7 +478,7 @@ class PlayerController extends Controller
             'totalCashIn',
             'totalCashOut',
             'chipDifference',
-            'ringTransactions' // ←ここを修正
+            'ringTransactions'
         ));
     }
 
