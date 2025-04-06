@@ -186,7 +186,6 @@ class PlayerController extends Controller
         $tab = $request->query('tab', 'tournament'); // デフォルトで "tournament"
 
         $ringTransactions = RingTransaction::where('player_id', $player->id)
-            ->whereDate('created_at', now()->toDateString())
             ->with(['zeroSystemHeader.details' => function ($query) {
                 $query->where('initial_chips', '>', 0)->orderByDesc('created_at');
             }])
@@ -301,7 +300,7 @@ class PlayerController extends Controller
 
             DB::commit();
 
-            return redirect()->route('players.show', $player)->with('success', '0円システムを登録しました');
+            return redirect()->route('zero-system.users', $player)->with('success', '0円システムを登録しました');
         } catch (\Exception $e) {
             DB::rollBack();
             \Log::error('0円システム登録エラー', ['exception' => $e]);
@@ -354,7 +353,7 @@ class PlayerController extends Controller
 
             DB::commit();
 
-            return redirect()->route('players.show', $player)->with('success', '未清算分をすべて精算しました');
+            return redirect()->back()->with('success', '未清算分をすべて精算しました');
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->with('error', '精算処理でエラーが発生しました: ' . $e->getMessage());
@@ -405,7 +404,7 @@ class PlayerController extends Controller
             ]);
         }
 
-        return redirect()->route('players.show', $player)->with('success', 'Cash-outが完了しました');
+        return redirect()->route('zero-system.users')->with('success', '更新が完了しました');
     }
 
     // 0円システムを利用しているプレイヤー一覧
@@ -485,18 +484,27 @@ class PlayerController extends Controller
     // RingTransaction 更新処理
     public function updateRingTransaction(Request $request, $id): JsonResponse
     {
-        $tx = \App\Models\RingTransaction::findOrFail($id);
-        $tx->chips = $request->chips;
-        $tx->comment = $request->comment;
-        $tx->save();
+        \Log::info("updateRingTransaction 入力:", $request->all());
 
-        return response()->json(['message' => '更新完了']);
+        try {
+            $tx = RingTransaction::findOrFail($id);
+            $tx->chips = $request->chips;
+            $tx->comment = $request->comment;
+            $tx->save();
+
+            \Log::info("更新完了:", $tx->toArray());
+
+            return response()->json(['message' => '更新完了']);
+        } catch (\Exception $e) {
+            \Log::error("更新失敗:", ['error' => $e->getMessage()]);
+            return response()->json(['error' => '更新に失敗しました'], 500);
+        }
     }
 
     // RingTransaction 削除処理
-    public function deleteRingTransaction($id): JsonResponse
+    public function deleteZeroSystemDetail($id): JsonResponse
     {
-        \App\Models\RingTransaction::destroy($id);
-        return response()->json(['message' => '削除完了']);
+        ZeroSystemDetail::destroy($id);
+        return response()->json(['message' => '明細を削除しました']);
     }
 }

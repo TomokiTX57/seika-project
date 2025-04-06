@@ -4,6 +4,8 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PlayerController;
 use App\Http\Controllers\TournamentController;
+use App\Http\Controllers\ZeroSystemDetailController;
+use App\Http\Controllers\RingTransactionController;
 
 
 /*
@@ -53,11 +55,13 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/zero-system-users', [PlayerController::class, 'zeroSystemUsers'])->name('zero-system.users');
     Route::get('/zero-system/edit/{player}', [PlayerController::class, 'editZeroSystem'])->name('zero-system.edit');
-    Route::post('/players/{player}/tournament-transactions', [PlayerController::class, 'storeTournamentTransaction'])->name('players.tournament.store');
     Route::get('/zero-system/checkout/{player}', [PlayerController::class, 'checkoutZeroSystem'])->name('zero-system.checkout');
-
-    Route::put('/ring-transactions/{id}', [PlayerController::class, 'updateRingTransaction']);
-    Route::delete('/ring-transactions/{id}', [PlayerController::class, 'deleteRingTransaction']);
+    // 0円システム詳細の更新・削除ルート（編集・削除ボタン対応）
+    Route::put('/zero-system-details/{id}', [ZeroSystemDetailController::class, 'update']);
+    Route::delete('/zero-system-details/{id}', [ZeroSystemDetailController::class, 'destroy']);
+    // RingTransaction 更新・削除ルート（編集・削除ボタン対応）
+    Route::put('/ring-transactions/{id}', [RingTransactionController::class, 'update']);
+    Route::delete('/ring-transactions/{id}', [RingTransactionController::class, 'destroy']);
 });
 
 require __DIR__ . '/auth.php';
