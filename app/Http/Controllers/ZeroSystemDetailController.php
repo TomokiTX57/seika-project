@@ -61,6 +61,11 @@ class ZeroSystemDetailController extends Controller
             $header->save();
         }
 
+        // 明細が他に無ければヘッダーも削除
+        if ($header && $header->details()->count() === 0) {
+            $header->delete();
+        }
+
         return response()->json(['message' => '削除完了']);
     }
 }
