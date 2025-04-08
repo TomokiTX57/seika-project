@@ -62,44 +62,48 @@
                     {{ $chipStatus }}
                 </div>
 
-
-
-                <!-- 引き出しフォーム -->
-                <form method="POST" action="{{ route('players.ring.withdraw', $player) }}" id="withdraw-form">
+                <form method="POST" id="unified-form"
+                    data-withdraw-url="{{ route('players.ring.withdraw', $player) }}"
+                    data-zero-url="{{ route('players.zero-system.store', $player) }}">
                     @csrf
-                    <div class="mb-2">
-                        <label>会計番号</label>
-                        <input type="text" name="accounting_number" class="form-control" form="withdraw-form">
-                    </div>
-                    <div class="mb-2">
-                        <label>引き出し額</label>
-                        <input type="number" name="withdraw_amount" class="form-control" required>
-                    </div>
-                    <div class="mb-2">
-                        <label>コメント</label>
-                        <textarea name="withdraw_comment" class="form-control"></textarea>
-                    </div>
-                    <button type="submit" class="btn btn-primary mt-2" {{ $player->hasUnsettledZeroSystem() ? 'disabled' : '' }}>引き出し</button>
-                </form>
 
-                @if ($player->hasUnsettledZeroSystem())
-                <div class="text-danger mt-1">
-                    ※ 0円システム精算が完了するまで引き出しできません
-                </div>
-                @endif
-
-                <!-- リング：0円システム -->
-                <form method="POST" action="{{ route('players.zero-system.store', $player) }}">
-                    @csrf
+                    <!-- 会計番号 -->
                     <div class="mb-2">
                         <label>会計番号</label>
                         <input type="text" name="accounting_number" class="form-control">
                     </div>
+
+                    <!-- チップ金額 -->
                     <div class="mb-2">
-                        <label>0円システム額</label>
-                        <input type="number" name="zero_amount" class="form-control" required>
+                        <label>金額</label>
+                        <input type="number" name="amount" class="form-control" required>
                     </div>
-                    <button type="submit" class="btn btn-warning mt-2">0円システム追加</button>
+
+                    <!-- コメント（引き出し用のみ） -->
+                    <div class="mb-2" id="withdraw-comment-area">
+                        <label>コメント</label>
+                        <textarea name="withdraw_comment" class="form-control"></textarea>
+                    </div>
+
+                    <!-- ボタン -->
+                    <div class="d-flex gap-2 mt-2">
+                        <button type="button" class="btn btn-primary"
+                            onclick="submitUnifiedForm('withdraw')"
+                            {{ $player->hasUnsettledZeroSystem() ? 'disabled' : '' }}>
+                            引き出し
+                        </button>
+
+                        <button type="button" class="btn btn-warning"
+                            onclick="submitUnifiedForm('zero')">
+                            0円システム
+                        </button>
+                    </div>
+
+                    @if ($player->hasUnsettledZeroSystem())
+                    <div class="text-danger mt-1">
+                        ※ 0円システム精算が完了するまで引き出しできません
+                    </div>
+                    @endif
                 </form>
 
                 <!-- リング：Cash-out -->
@@ -182,4 +186,5 @@
             <p class="text-red-500 font-bold">uidを更新してください</p>
             @endif
         </div>
+        @vite('resources/js/unified-form.js')
 </x-app-layout>
