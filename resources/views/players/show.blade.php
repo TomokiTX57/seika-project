@@ -32,11 +32,6 @@
         <div class="text-red-500 font-bold mb-4">サブスク利用中</div>
         @endif
 
-        <!-- 0円システム or 引き出し利用中 -->
-        <div class="border p-4 rounded mb-4 text-white {{ $player->hasUnsettledZeroSystem() ? 'bg-danger' : 'bg-success' }}">
-            {{ $chipStatus }}
-        </div>
-
         <!--  Bootstrap ナビゲーションタブ -->
         <ul class="nav nav-tabs mt-4" id="playerTabs" role="tablist">
             <li class="nav-item" role="presentation">
@@ -62,14 +57,20 @@
                     <!-- 合計: <strong>{{ number_format($player->total_ring_chips) }} 点</strong> -->
                 </p>
 
-                <div class="mb-2">
-                    <label>会計番号</label>
-                    <input type="text" name="accounting_number" class="form-control" form="withdraw-form">
+                <!-- 0円システム or 引き出し利用中 -->
+                <div class="border p-4 rounded mb-4 text-white {{ $player->hasUnsettledZeroSystem() ? 'bg-danger' : 'bg-success' }}">
+                    {{ $chipStatus }}
                 </div>
+
+
 
                 <!-- 引き出しフォーム -->
                 <form method="POST" action="{{ route('players.ring.withdraw', $player) }}" id="withdraw-form">
                     @csrf
+                    <div class="mb-2">
+                        <label>会計番号</label>
+                        <input type="text" name="accounting_number" class="form-control" form="withdraw-form">
+                    </div>
                     <div class="mb-2">
                         <label>引き出し額</label>
                         <input type="number" name="withdraw_amount" class="form-control" required>
