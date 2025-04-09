@@ -35,20 +35,16 @@
                         <tr>
                             <th>日付</th>
                             <th>チップ</th>
-                            <th>0円システム</th>
+                            <th>合計チップ</th>
+                            <th>種別</th>
+                            <th>処理</th>
                             <th>会計番号</th>
                             <th>コメント</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach ($player->ringTransactions->sortByDesc('created_at') as $tx)
-                        <tr>
-                            <td>{{ $tx->created_at->format('Y-m-d H:i') }}</td>
-                            <td>{{ $tx->chips }}</td>
-                            <td>{{ $tx->is_zero_system ? '✅' : '✖' }}</td>
-                            <td>{{ $tx->accounting_number }}</td>
-                            <td>{{ $tx->comment }}</td>
-                        </tr>
+                        @foreach ($ringTransactions as $tx)
+                        @include('components.transaction-row', ['tx' => $tx])
                         @endforeach
                     </tbody>
                 </table>
@@ -89,4 +85,6 @@
             @endif
         </div>
     </div>
+
+    @vite(['resources/js/history-action.js'])
 </x-app-layout>

@@ -32,21 +32,6 @@
         <div class="text-red-500 font-bold mb-4">サブスク利用中</div>
         @endif
 
-        <!-- 0円システム or 引き出し利用中 -->
-        <div class="border p-4 rounded mb-4">
-            0円システム利用中 / 引き出し利用中 のどちらかを表示
-        </div>
-
-        <!-- QRコード -->
-        <div class="mt-4 p-4 border rounded bg-gray-50">
-            <strong>QRコード</strong>
-            @if ($player->uid)
-            <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={{ $player->uid }}" alt="QR Code">
-            @else
-            <p class="text-red-500 font-bold">uidを更新してください</p>
-            @endif
-        </div>
-
         <!--  Bootstrap ナビゲーションタブ -->
         <ul class="nav nav-tabs mt-4" id="playerTabs" role="tablist">
             <li class="nav-item" role="presentation">
@@ -61,54 +46,105 @@
             </li>
         </ul>
 
-        <!--  タブの内容 -->
+        <!-- タブの内容 -->
         <div class="tab-content mt-3" id="playerTabsContent">
-
-            <!--  リング -->
+            <!-- リング -->
             <div class="tab-pane fade show active" id="ring" role="tabpanel" aria-labelledby="ring-tab">
-                <p><strong>保有チップ:</strong> ○○点</p>
+                <p>
+                    <strong>保有リングチップ: {{ number_format($ringChips) }} 点</strong><br>
+                    <!-- 通常: <strong>{{ number_format($ringChips) }} 点</strong><br> -->
+                    0円システム: {{ number_format($unsettledZeroChips) }} 点<br>
+                    <!-- 合計: <strong>{{ number_format($player->total_ring_chips) }} 点</strong> -->
+                </p>
 
-                <h5>cash-in</h5>
-                <div class="mb-2">
-                    <label>引き出し額</label>
-                    <input type="text" class="form-control">
-                    <button class="btn btn-primary mt-2">ボタン</button>
+                <!-- 0円システム or 引き出し利用中 -->
+                <div class="border p-4 rounded mb-4 text-white {{ $player->hasUnsettledZeroSystem() ? 'bg-danger' : 'bg-success' }}">
+                    {{ $chipStatus }}
                 </div>
 
-                <div class="mb-2">
-                    <label>0円システム</label>
-                    <input type="text" class="form-control">
-                    <button class="btn btn-primary mt-2">ボタン</button>
-                </div>
+                <form method="POST" id="unified-form"
+                    data-withdraw-url="{{ route('players.ring.withdraw', $player) }}"
+                    data-zero-url="{{ route('players.zero-system.store', $player) }}">
+                    @csrf
 
-                <h5>cash-out</h5>
-                <div class="mb-2">
-                    <label>アウト額</label>
-                    <input type="text" class="form-control">
-                    <button class="btn btn-primary mt-2">ボタン</button>
-                </div>
+                    <!-- 会計番号 -->
+                    <div class="mb-2">
+                        <label>会計番号</label>
+                        <input type="text" name="accounting_number" class="form-control">
+                    </div>
 
-                <div class="mb-2">
-                    <label>コメント入力</label>
-                    <textarea class="form-control"></textarea>
-                </div>
+                    <!-- チップ金額 -->
+                    <div class="mb-2">
+                        <label>Cash in</label>
+                        <input type="number" name="amount" class="form-control" required>
+                    </div>
 
-                <a href="{{ route('players.history', ['player' => $player->id, 'tab' => 'ring']) }}" class="btn btn-secondary mt-2">
+                    <!-- コメント（引き出し用のみ） -->
+                    <div class="mb-2" id="withdraw-comment-area">
+                        <label>コメント</label>
+                        <textarea name="withdraw_comment" class="form-control"></textarea>
+                    </div>
+
+                    <!-- ボタン -->
+                    <div class="d-flex gap-2 mt-2">
+                        <button type="button" class="btn btn-primary"
+                            onclick="submitUnifiedForm('withdraw')"
+                            {{ $player->hasUnsettledZeroSystem() ? 'disabled' : '' }}>
+                            引き出し
+                        </button>
+
+                        <button type="button" class="btn btn-warning"
+                            onclick="submitUnifiedForm('zero')">
+                            0円システム
+                        </button>
+                    </div>
+
+                    @if ($player->hasUnsettledZeroSystem())
+                    <div class="text-danger mt-1">
+                        ※ 0円システム精算が完了するまで引き出しできません
+                    </div>
+                    @endif
+                </form>
+
+                <!-- リング：Cash-out -->
+                <form method="POST" action="{{ route('players.ring.cashout', $player) }}">
+                    @csrf
+                    <div class="mb-2">
+                        <label>Cash out</label>
+                        <input type="number" name="cashout_amount" class="form-control" required>
+                    </div>
+                    <div class="mb-2">
+                        <label>コメント</label>
+                        <textarea name="cashout_comment" class="form-control"></textarea>
+                    </div>
+                    <div class="flex gap-2">
+                        <button type="submit" class="btn btn-success">Cash-out</button>
+
+                        <a href="{{ route('players.ring.settle', $player) }}"
+                            class="btn btn-secondary {{ !$shouldSettle ? 'disabled pointer-events-none opacity-50' : '' }}">
+                            精算
+                        </a>
+
+                        @if (!$shouldSettle)
+                        <div class="text-sm text-gray-500 mt-1">清算が不要、または既に完了しています。</div>
+                        @endif
+                    </div>
+                </form>
+
+                <a href="{{ route('players.history', ['player' => $player->id, 'tab' => 'ring']) }}" class="btn btn-outline-secondary mt-3">
                     リング履歴を見る
                 </a>
             </div>
 
-            <!--  トナメ -->
+            <!-- トナメ -->
             <div class="tab-pane fade" id="tournament" role="tabpanel" aria-labelledby="tournament-tab">
                 <form method="POST" action="{{ route('players.tournament.store', $player) }}">
                     @csrf
                     <p><strong>保有トナメチップ:</strong> {{ number_format($tournamentChips) }} 点</p>
+
                     <div class="mb-2">
                         <label>チップ</label>
-                        <!-- 表示用（ユーザーが見る/入力する） -->
                         <input type="text" id="chips_view" class="form-control" inputmode="numeric">
-
-                        <!-- 実際に送信される値（hidden） -->
                         <input type="hidden" name="chips" id="chips_real">
                     </div>
 
@@ -140,4 +176,15 @@
                 </a>
             </div>
         </div>
+
+        <!-- QRコード -->
+        <div class="mt-4 p-4 border rounded bg-gray-50">
+            <strong>QRコード</strong>
+            @if ($player->uid)
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={{ $player->uid }}" alt="QR Code">
+            @else
+            <p class="text-red-500 font-bold">uidを更新してください</p>
+            @endif
+        </div>
+        @vite('resources/js/unified-form.js')
 </x-app-layout>

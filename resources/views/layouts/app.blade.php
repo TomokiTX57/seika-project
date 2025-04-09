@@ -20,30 +20,19 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body class="font-sans antialiased">
-    <div class="min-h-screen bg-gray-100">
-        @include('layouts.navigation')
+<body class="bg-light">
+    <div class="container-fluid p-0">
+        <div class="d-flex flex-column min-vh-100">
+            @include('layouts.navigation')
+            <div class="flex">
+                @include('layouts.sidebar') <!-- ←ここで読み込む -->
 
-
-
-        <div class="flex h-screen">
-            <!--  サイドバー -->
-            <aside class="bg-red-500 w-56 p-6 h-screen flex flex-col">
-                <nav class="flex-1">
-                    <ul class="space-y-4 text-white">
-                        <li><a href="{{ route('players.index') }}" class="block px-4 py-2 hover:bg-blue-700">Player検索</a></li>
-                        <li><a href="#" class="block px-4 py-2 hover:bg-blue-700">0円システム利用者表示</a></li>
-                        <li><a href="{{ route('tournaments.index') }}" class="block px-4 py-2 hover:bg-blue-700">トーナメント</a></li>
-                        <li><a href="{{ route('players.subscribed') }}" class="block px-4 py-2 hover:bg-blue-700">サブスク利用者表示</a></li>
-                    </ul>
-                </nav>
-            </aside>
-
-            <!-- Page Content -->
-            <main>
-                {{ $slot }}
-            </main>
+                <main class="flex-1 p-4">
+                    {{ $slot }} <!-- コンテンツ本体 -->
+                </main>
+            </div>
         </div>
+    </div>
 </body>
 
 </html>

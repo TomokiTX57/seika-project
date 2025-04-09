@@ -5,7 +5,7 @@
         </h2>
     </x-slot>
 
-    <div class="flex">
+    <div class="d-flex w-100">
 
         <!-- メインコンテンツ -->
         <div class="w-4/5 p-6">
@@ -25,21 +25,21 @@
             </div>
 
             <!-- 検索結果 -->
-            <div class="border p-4 bg-white">
-                <table class="w-full border-collapse">
-                    <thead>
-                        <tr class="border-b">
-                            <th class="p-2 text-left">Player Name</th>
-                            <th class="p-2 text-left">MyID</th>
-                            <th class="p-2 text-left">登録日</th>
+            <div class="table-responsive bg-white p-3 rounded">
+                <table class="table table-bordered table-hover text-nowrap bg-white">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Player Name</th>
+                            <th>MyID</th>
+                            <th>登録日</th>
                         </tr>
                     </thead>
                     <tbody id="player-list">
                         @foreach ($players as $player)
-                        <tr class="border-b cursor-pointer hover:bg-gray-100" data-url="{{ route('players.show', $player->id) }}">
-                            <td class="p-2">{{ $player->player_name }}</td>
-                            <td class="p-2">{{ $player->player_my_id }}</td>
-                            <td class="p-2">{{ $player->created_at->format('Y-m-d') }}</td>
+                        <tr class="cursor-pointer" data-url="{{ route('players.show', $player->id) }}">
+                            <td>{{ $player->player_name }}</td>
+                            <td>{{ $player->player_my_id }}</td>
+                            <td>{{ $player->created_at->format('Y-m-d') }}</td>
                         </tr>
                         @endforeach
                     </tbody>
