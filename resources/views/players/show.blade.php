@@ -75,7 +75,7 @@
 
                     <!-- チップ金額 -->
                     <div class="mb-2">
-                        <label>金額</label>
+                        <label>Cash in</label>
                         <input type="number" name="amount" class="form-control" required>
                     </div>
 
@@ -110,7 +110,7 @@
                 <form method="POST" action="{{ route('players.ring.cashout', $player) }}">
                     @csrf
                     <div class="mb-2">
-                        <label>アウト額</label>
+                        <label>Cash out</label>
                         <input type="number" name="cashout_amount" class="form-control" required>
                     </div>
                     <div class="mb-2">
