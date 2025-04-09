@@ -1,11 +1,15 @@
 <!-- ハンバーガーメニュー（モバイル） -->
+<!-- 
 <div class="md:hidden p-4">
     <button id="menu-button" class="text-white bg-gray-800 px-4 py-2 rounded">
-        ☰ メニュー
+        ☰
     </button>
 </div>
+-->
+
 
 <!-- モバイルメニュー -->
+<!-- 
 <div id="mobile-menu" class="fixed right-0 top-0 h-full w-64 bg-gray-800 text-white shadow-lg transform translate-x-full transition-transform duration-300 z-50">
     <ul class="mt-16 space-y-6 p-4">
         <li><a href="{{ route('players.index') }}" class="block hover:text-blue-400">Player検索</a></li>
@@ -13,7 +17,8 @@
         <li><a href="{{ route('tournaments.index') }}" class="block hover:text-blue-400">トーナメント</a></li>
         <li><a href="{{ route('players.subscribed') }}" class="block hover:text-blue-400">サブスク利用者表示</a></li>
     </ul>
-</div>
+</div> 
+-->
 
 <!-- PC用サイドバー -->
 <!-- layouts/sidebar.blade.php -->
