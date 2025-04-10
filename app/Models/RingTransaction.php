@@ -24,4 +24,9 @@ class RingTransaction extends Model
     {
         return $this->hasOne(ZeroSystemHeader::class);
     }
+
+    public function player()
+    {
+        return $this->belongsTo(Player::class);
+    }
 }

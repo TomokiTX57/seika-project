@@ -27,6 +27,7 @@
         <ul class="space-y-4 text-white">
             <li><a href="{{ route('players.index') }}" class="block px-4 py-2 hover:bg-blue-700">Player検索</a></li>
             <li><a href="{{ route('zero-system.users') }}" class="block px-4 py-2 hover:bg-blue-700">0円システム利用者表示</a></li>
+            <li><a href="{{ route('ring-histories.index') }}" class="block px-4 py-2 hover:bg-blue-700">リング履歴</a></li>
             <li><a href="{{ route('tournaments.index') }}" class="block px-4 py-2 hover:bg-blue-700">トーナメント</a></li>
             <li><a href="{{ route('players.subscribed') }}" class="block px-4 py-2 hover:bg-blue-700">サブスク利用者表示</a></li>
         </ul>

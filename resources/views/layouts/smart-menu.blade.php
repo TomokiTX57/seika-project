@@ -7,6 +7,10 @@
     トーナメント管理
 </x-responsive-nav-link>
 
+<x-responsive-nav-link :href="route('ring-histories.index')" :active="request()->routeIs('ring.*')">
+    リング履歴
+</x-responsive-nav-link>
+
 <x-responsive-nav-link :href="route('zero-system.users')" :active="request()->routeIs('zero-system.*')">
     0円システム
 </x-responsive-nav-link>

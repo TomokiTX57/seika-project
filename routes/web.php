@@ -6,6 +6,7 @@ use App\Http\Controllers\PlayerController;
 use App\Http\Controllers\TournamentController;
 use App\Http\Controllers\ZeroSystemDetailController;
 use App\Http\Controllers\RingTransactionController;
+use App\Http\Controllers\RingHistoryController;
 
 
 /*
@@ -35,6 +36,7 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::get('/players', [PlayerController::class, 'index'])->name('players.index');
+
     Route::get('/players/create', [PlayerController::class, 'create'])->name('players.create');
     Route::get('/players/search', [PlayerController::class, 'search'])->name('players.search');
     Route::get('/players/{player}', [PlayerController::class, 'show'])->name('players.show');
@@ -43,10 +45,15 @@ Route::middleware('auth')->group(function () {
     Route::put('/players/{player}', [PlayerController::class, 'update'])->name('players.update');
     Route::post('/players/{player}/tournament-transactions', [PlayerController::class, 'storeTournamentTransaction'])->name('players.tournament.store');
     Route::get('/players/{player}/history', [PlayerController::class, 'history'])->name('players.history');
+
     Route::get('/tournaments', [TournamentController::class, 'index'])->name('tournaments.index');
     Route::get('/tournaments/{tournament}/edit', [TournamentController::class, 'edit'])->name('tournaments.edit');
     Route::put('/tournaments/{tournament}', [TournamentController::class, 'update'])->name('tournaments.update');
+
     Route::get('/subscribed-players', [PlayerController::class, 'subscribed'])->name('players.subscribed');
+
+    Route::get('/ring-histories', [RingHistoryController::class, 'index'])->name('ring-histories.index');
+
     Route::post('/players/{player}/ring/withdraw', [PlayerController::class, 'withdrawRing'])->name('players.ring.withdraw');
     Route::post('/players/{player}/ring/cashout', [PlayerController::class, 'cashoutRing'])->name('players.ring.cashout');
     Route::get('/players/{player}/ring/settle', [PlayerController::class, 'settleRing'])->name('players.ring.settle');
