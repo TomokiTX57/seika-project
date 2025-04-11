@@ -1,0 +1,33 @@
+FROM php:8.2-fpm
+
+COPY ./docker/php/php.ini /usr/local/etc/php/php.ini
+
+# Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+# Node.js v20
+COPY --from=node:20.16 /usr/local/bin /usr/local/bin
+COPY --from=node:20.16 /usr/local/lib /usr/local/lib
+
+# パッケージとPHP拡張
+RUN apt-get update \
+    && apt-get install -y git zip unzip vim \
+    && docker-php-ext-install pdo_mysql bcmath \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /var/www/html
+
+# Laravelコード
+COPY . /var/www/html
+
+# .env を Render用にセット（必要なら .env.production を準備）
+COPY .env.production .env
+
+# キャッシュとビルド（npm run build で失敗しやすいので注意）
+RUN composer install --no-dev --optimize-autoloader \
+    && php artisan config:cache \
+    && npm install \
+    && npm run build
+
+CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8080"]
