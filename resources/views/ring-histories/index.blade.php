@@ -15,16 +15,16 @@
     </form>
 
     {{-- 履歴テーブル --}}
-    <table class="table table-bordered table-striped">
+    <table class="table table-bordered table-striped text-xs whitespace-normal w-full">
         <thead>
             <tr>
-                <th>会計番号</th>
-                <th>プレイヤー名</th>
-                <th>チップ</th>
-                <th>合計チップ</th>
-                <th>種別</th>
-                <th>処理</th>
-                <th>コメント</th>
+                <th class="whitespace-nowrap">会計番号</th>
+                <th class="whitespace-nowrap">プレイヤー名</th>
+                <th class="whitespace-nowrap">チップ</th>
+                <th class="whitespace-nowrap">合計チップ</th>
+                <th class="whitespace-nowrap">種別</th>
+                <th class="whitespace-nowrap">処理</th>
+                <th class="whitespace-nowrap">コメント</th>
             </tr>
         </thead>
         <tbody>
@@ -35,13 +35,13 @@
 
             @if (!$isZeroIn)
             <tr>
-                <td>{{ $tx->accounting_number ?? '―' }}</td>
-                <td>{{ $tx->player->player_name ?? '―' }}</td>
-                <td>{{ $tx->chips }}</td>
-                <td>{{ $tx->zeroSystemHeader->sum_initial_chips ?? '―' }}</td>
-                <td>{{ $tx->type }}</td>
-                <td>{{ $tx->action }}</td>
-                <td>{{ $tx->comment ?? '―' }}</td>
+                <td class="whitespace-nowrap">{{ $tx->accounting_number ?? '―' }}</td>
+                <td class="whitespace-nowrap">{{ $tx->player->player_name ?? '―' }}</td>
+                <td class="whitespace-nowrap">{{ $tx->chips }}</td>
+                <td class="whitespace-nowrap">{{ $tx->zeroSystemHeader->sum_initial_chips ?? '―' }}</td>
+                <td class="whitespace-nowrap">{{ $tx->type }}</td>
+                <td class="whitespace-nowrap">{{ $tx->action }}</td>
+                <td class="whitespace-nowrap">{{ $tx->comment ?? '―' }}</td>
             </tr>
             @endif
             @empty

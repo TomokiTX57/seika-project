@@ -27,7 +27,7 @@
             <div class="flex">
                 @include('layouts.sidebar') <!-- ←ここで読み込む -->
 
-                <main class="flex-1 p-4">
+                <main class="flex-1 p-1">
                     {{ $slot }} <!-- コンテンツ本体 -->
                 </main>
             </div>
