@@ -3,29 +3,29 @@
         <h2 class="text-xl font-bold">0円システム利用者一覧（本日）</h2>
     </x-slot>
 
-    <div class="p-6 bg-white shadow rounded">
-        <table class="table table-bordered">
+    <div class="p-3 overflow-x-auto bg-white shadow rounded">
+        <table class="table table-bordered table-striped text-xs w-full">
             <thead>
                 <tr>
-                    <th>会計番号</th>
-                    <th>プレイヤー名</th>
-                    <th>Cash In</th>
-                    <th>Cash Out</th>
-                    <th>操作</th>
-                    <th>会計</th>
+                    <th class="whitespace-nowrap">会計番号</th>
+                    <th class="whitespace-nowrap">プレイヤー名</th>
+                    <th class="whitespace-nowrap">Cash In</th>
+                    <th class="whitespace-nowrap">Cash Out</th>
+                    <th class="whitespace-nowrap">操作</th>
+                    <th class="whitespace-nowrap">会計</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach($headers as $header)
                 <tr>
-                    <td>{{ optional($header->ringTransaction)->accounting_number ?? '―' }}</td>
-                    <td>{{ $header->player->player_name }}</td>
-                    <td>{{ $header->details->sum('initial_chips') }}</td>
-                    <td>{{ $header->final_chips ?? '-' }}</td>
-                    <td>
+                    <td class="whitespace-nowrap">{{ optional($header->ringTransaction)->accounting_number ?? '―' }}</td>
+                    <td class="whitespace-nowrap">{{ $header->player->player_name }}</td>
+                    <td class="whitespace-nowrap">{{ $header->details->sum('initial_chips') }}</td>
+                    <td class="whitespace-nowrap">{{ $header->final_chips ?? '-' }}</td>
+                    <td class="whitespace-nowrap">
                         <a href="{{ route('zero-system.edit', $header->player->id) }}" class="btn btn-primary btn-sm">編集</a>
                     </td>
-                    <td>
+                    <td class="whitespace-nowrap">
                         <a href="{{ route('zero-system.checkout', $header->player->id) }}" class="btn btn-secondary btn-sm">会計</a>
                     </td>
                 </tr>

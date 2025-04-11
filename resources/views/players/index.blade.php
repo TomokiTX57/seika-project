@@ -8,7 +8,7 @@
     <div class="d-flex w-100">
 
         <!-- メインコンテンツ -->
-        <div class="w-4/5 p-6">
+        <div class="w-full p-1">
 
 
             <!-- 新規作成ボタン -->
@@ -25,8 +25,8 @@
             </div>
 
             <!-- 検索結果 -->
-            <div class="table-responsive bg-white p-3 rounded">
-                <table class="table table-bordered table-hover text-nowrap bg-white">
+            <div class="bg-white p-3 rounded overflow-x-auto">
+                <table class="table table-bordered table-hover text-sm whitespace-normal bg-white w-full">
                     <thead class="thead-light">
                         <tr>
                             <th>Player Name</th>

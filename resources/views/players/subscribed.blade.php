@@ -3,7 +3,7 @@
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">サブスク利用者一覧</h2>
     </x-slot>
 
-    <div class="p-6">
+    <div class="p-1">
         <div class="bg-white shadow rounded p-4">
             <table class="w-full border-collapse">
                 <thead>

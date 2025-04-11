@@ -1,5 +1,3 @@
-<!-- resources/views/tournaments/index.blade.php -->
-
 <x-app-layout>
     <x-slot name="header">
         <div class="flex justify-between items-center">
@@ -24,21 +22,20 @@
         </form>
 
         <!-- 一覧テーブル -->
-        <div clas="boarder p-4 bg-white">
-            <table class="w-full border-collapse">
+        <div class="p-3 overflow-x-auto bg-white">
+            <table class="table table-bordered table-striped text-xs w-full">
                 <thead>
                     <tr class="border-b">
-                        <th class="border px-2 py-1">会計番号</th>
-                        <th class="border px-2 py-1">プレイヤーネーム</th>
-                        <th class="border px-2 py-1">保有チップ</th>
-                        <th class="border px-2 py-1">ランキング</th>
-                        <th class="border px-2 py-1">付与チップ</th>
-                        <th class="border px-2 py-1">ポイント</th>
-                        <th class="border px-2 py-1">エントリー</th>
-                        <th class="border px-2 py-1">操作</th>
+                        <th class="border px-2 py-1 whitespace-nowrap">会計番号</th>
+                        <th class="border px-2 py-1 whitespace-nowrap">プレイヤーネーム</th>
+                        <th class="border px-2 py-1 whitespace-nowrap">保有チップ</th>
+                        <th class="border px-2 py-1 whitespace-nowrap">ランキング</th>
+                        <th class="border px-2 py-1 whitespace-nowrap">付与チップ</th>
+                        <th class="border px-2 py-1 whitespace-nowrap">ポイント</th>
+                        <th class="border px-2 py-1 whitespace-nowrap">エントリー</th>
+                        <th class="border px-2 py-1 whitespace-nowrap">操作</th>
                     </tr>
                 </thead>
-                <tbody>
                 <tbody>
                     @foreach ($groupedByPlayer as $playerId => $playerTransactions)
                     @php
@@ -48,19 +45,18 @@
                     $entrySum = $playerTransactions->sum('entry');
                     @endphp
                     <tr>
-                        <td class="border px-2 py-1">{{ $firstTx->accounting_number ?? '--' }}</td>
-                        <td class="border px-2 py-1">{{ $player->player_name ?? '不明' }}</td>
-                        <td class="border px-2 py-1 text-right">{{ number_format($chipSum) }}</td>
-                        <td class="border px-2 py-1 text-center">--</td> {{-- ランキング仮 --}}
-                        <td class="border px-2 py-1 text-right">{{ $firstTx->chips }}</td>
-                        <td class="border px-2 py-1 text-right">{{ $firstTx->points }}</td>
-                        <td class="border px-2 py-1 text-center">{{ number_format($entrySum) }}</td>
-                        <td class="border px-2 py-1 text-center">
+                        <td class="border px-2 py-1 whitespace-nowrap">{{ $firstTx->accounting_number ?? '--' }}</td>
+                        <td class="border px-2 py-1 whitespace-nowrap">{{ $player->player_name ?? '不明' }}</td>
+                        <td class="border px-2 py-1 text-right whitespace-nowrap">{{ number_format($chipSum) }}</td>
+                        <td class="border px-2 py-1 text-center whitespace-nowrap">--</td> {{-- ランキング仮 --}}
+                        <td class="border px-2 py-1 text-right whitespace-nowrap">{{ $firstTx->chips }}</td>
+                        <td class="border px-2 py-1 text-right whitespace-nowrap">{{ $firstTx->points }}</td>
+                        <td class="border px-2 py-1 text-center whitespace-nowrap">{{ number_format($entrySum) }}</td>
+                        <td class="border px-2 py-1 text-center whitespace-nowrap">
                             <a href="{{ route('tournaments.edit', $firstTx->id) }}" class="px-2 py-1 bg-blue-500 text-white rounded">編集</a>
                         </td>
                     </tr>
                     @endforeach
-                </tbody>
                 </tbody>
             </table>
         </div>
