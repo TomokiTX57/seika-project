@@ -26,26 +26,38 @@ class RingTransactionController extends Controller
             'updated_chips' => $tx->chips,
         ]);
 
-        // 0円システムの out の場合、final_chips も更新
-        if ($tx->is_zero_system && $tx->type === '0円システム' && $tx->action === 'out') {
-            $header = \App\Models\ZeroSystemHeader::where('player_id', $tx->player_id)
-                ->whereDate('created_at', $tx->created_at->toDateString())
-                ->where('final_chips', $originalChips)
-                ->first();
+        if ($tx->is_zero_system && $tx->type === '0円システム') {
+            if ($tx->action === 'out') {
+                $header = \App\Models\ZeroSystemHeader::where('player_id', $tx->player_id)
+                    ->whereDate('created_at', $tx->created_at->toDateString())
+                    ->where('final_chips', $originalChips)
+                    ->first();
 
-            if ($header) {
-                $header->final_chips = $tx->chips;
-                $header->save();
+                if ($header) {
+                    $header->final_chips = $tx->chips;
+                    $header->save();
 
-                \Log::info('ZeroSystemHeader final_chips を更新', [
-                    'header_id' => $header->id,
-                    'final_chips' => $header->final_chips,
-                ]);
-            } else {
-                \Log::warning('final_chips を更新できるヘッダーが見つかりませんでした', [
-                    'player_id' => $tx->player_id,
-                    'original_chips' => $originalChips,
-                ]);
+                    \Log::info('ZeroSystemHeader final_chips を更新', [
+                        'header_id' => $header->id,
+                        'final_chips' => $header->final_chips,
+                    ]);
+                } else {
+                    \Log::warning('final_chips を更新できるヘッダーが見つかりませんでした', [
+                        'player_id' => $tx->player_id,
+                        'original_chips' => $originalChips,
+                    ]);
+                }
+            } elseif ($tx->action === 'in') {
+                $header = $tx->zeroSystemHeader;
+                if ($header) {
+                    $header->sum_initial_chips = $header->details()->sum('initial_chips');
+                    $header->save();
+
+                    \Log::info('ZeroSystemHeader sum_initial_chips を更新', [
+                        'header_id' => $header->id,
+                        'sum_initial_chips' => $header->sum_initial_chips,
+                    ]);
+                }
             }
         }
 

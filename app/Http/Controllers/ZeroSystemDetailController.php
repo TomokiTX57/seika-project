@@ -29,11 +29,7 @@ class ZeroSystemDetailController extends Controller
         $header = $detail->header;
         $header->sum_initial_chips = $header->details()->sum('initial_chips');
 
-        // 既にfinal_chipsがあれば null に戻す（追加入力されたとみなして）
-        if (!is_null($header->final_chips)) {
-            $header->final_chips = null;
-        }
-
+        // final_chips が null のときのみ保存（null以外なら保持）
         $header->save();
 
         return response()->json(['message' => '更新完了']);
