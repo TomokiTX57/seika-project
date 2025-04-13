@@ -186,5 +186,15 @@
             <p class="text-red-500 font-bold">uidを更新してください</p>
             @endif
         </div>
+
+        <!-- 削除ボタン -->
+        <form method="POST" action="{{ route('players.destroy', $player->id) }}" class="text-center mt-4">
+            @csrf
+            @method('DELETE')
+            <button type="submit" class="px-4 py-2 bg-red-500 text-white rounded"
+                onclick="return confirm('本当にこのプレイヤーを削除しますか？')">
+                プレイヤーを削除
+            </button>
+        </form>
         @vite('resources/js/unified-form.js')
 </x-app-layout>
