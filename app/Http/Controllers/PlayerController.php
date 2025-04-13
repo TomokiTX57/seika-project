@@ -260,9 +260,14 @@ class PlayerController extends Controller
     // 0円システムのcashin
     public function storeZeroSystem(Request $request, Player $player)
     {
-        $request->validate([
-            'zero_amount' => 'required|integer|min:1',
-        ]);
+
+        \Log::debug('zero_amountの値: ' . json_encode($request->input('zero_amount')));
+
+        if ($request->filled('zero_amount')) {
+            $request->validate([
+                'zero_amount' => 'required|integer|min:1',
+            ]);
+        }
 
         \Log::info('storeZeroSystem リクエスト受信', $request->all());
 
@@ -315,7 +320,8 @@ class PlayerController extends Controller
 
             DB::commit();
 
-            return redirect()->route('zero-system.users', $player)->with('success', '0円システムを登録しました');
+            return redirect($request->input('redirect_to', route('players.show', $player)))
+                ->with('success', '0円システムを登録しました');
         } catch (\Exception $e) {
             DB::rollBack();
             \Log::error('0円システム登録エラー', ['exception' => $e]);
@@ -383,6 +389,11 @@ class PlayerController extends Controller
             'cashout_comment' => 'nullable|string|max:1000',
         ]);
 
+        \Log::info('cashout処理開始', [
+            'player_id' => $player->id,
+            'cashout_amount' => $request->cashout_amount,
+        ]);
+
         $today = now()->toDateString();
 
         // 今日の未精算ゼロシステムを探す
@@ -391,10 +402,15 @@ class PlayerController extends Controller
             ->whereNull('final_chips')
             ->first();
 
+
+        \Log::info('取得したheader', $header?->toArray() ?? ['header' => null]);
+
         if ($header) {
             // final_chips を更新
             $header->final_chips = $request->cashout_amount;
             $header->save();
+
+            \Log::info('final_chipsを更新しました', ['final_chips' => $header->final_chips]);
 
             // RingTransaction にも記録（0円システム out として履歴に表示）
             RingTransaction::create([

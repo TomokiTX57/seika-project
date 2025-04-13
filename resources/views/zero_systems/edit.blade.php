@@ -13,6 +13,10 @@
         <!-- Cash in フォーム -->
         <form method="POST" action="{{ route('players.zero-system.store', $player) }}">
             @csrf
+
+            <!-- 前のページにリダイレクトするための隠しフィールド -->
+            <input type="hidden" name="redirect_to" value="{{ route('zero-system.users') }}">
+
             <div class="mb-3">
                 <label for="zero_amount" class="form-label">Cash in (0円システム額)</label>
                 <input type="number" name="zero_amount" id="zero_amount" class="form-control" required>
@@ -23,6 +27,10 @@
         <!-- Cash out フォーム -->
         <form method="POST" action="{{ route('players.ring.cashout', $player) }}" class="mt-4">
             @csrf
+
+            <!-- 前のページにリダイレクトするための隠しフィールド -->
+            <input type="hidden" name="redirect_to" value="{{ route('zero-system.users') }}">
+
             <div class="mb-3">
                 <label for="cashout_amount" class="form-label">Cash out (精算額)</label>
                 <input type="number" name="cashout_amount" id="cashout_amount" class="form-control" required>
