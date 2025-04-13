@@ -67,7 +67,7 @@
                     data-zero-url="{{ route('players.zero-system.store', $player) }}">
                     @csrf
 
-                    <!-- 0円システム処理後にリダイレクトするURL -->
+                    <!-- cashin処理後にリダイレクトするURL -->
                     <input type="hidden" name="redirect_to" value="{{ route('players.show', $player->id) }}">
 
                     <!-- 会計番号 -->
@@ -112,6 +112,10 @@
                 <!-- リング：Cash-out -->
                 <form method="POST" action="{{ route('players.ring.cashout', $player) }}">
                     @csrf
+
+                    <!-- cashout後にリダイレクトするURL -->
+                    <input type="hidden" name="redirect_to" value="{{ route('players.show', $player->id) }}">
+
                     <div class="mb-2">
                         <label>Cash out</label>
                         <input type="number" name="cashout_amount" class="form-control" required>

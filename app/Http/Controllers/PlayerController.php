@@ -435,7 +435,8 @@ class PlayerController extends Controller
             ]);
         }
 
-        return redirect()->route('zero-system.users')->with('success', '更新が完了しました');
+        return redirect($request->input('redirect_to', route('zero-system.users')))
+            ->with('success', '更新が完了しました');
     }
 
     // 0円システムを利用しているプレイヤー一覧
