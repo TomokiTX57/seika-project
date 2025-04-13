@@ -42,6 +42,10 @@
                             <td>{{ $player->created_at->format('Y-m-d') }}</td>
                         </tr>
                         @endforeach
+
+                        <div class="m-3">
+                            {{ $players->links('pagination::bootstrap-4') }}
+                        </div>
                     </tbody>
                 </table>
             </div>

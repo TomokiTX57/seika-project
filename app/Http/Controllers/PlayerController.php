@@ -12,13 +12,21 @@ use App\Models\ZeroSystemHeader;
 use App\Models\ZeroSystemDetail;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Jenssegers\Agent\Agent;
 
 class PlayerController extends Controller
 {
-    // プレイヤー一覧
-    public function index()
+    // プレイヤー一覧　ページネーション
+    public function index(Request $request)
     {
-        $players = Player::orderBy('created_at', 'asc')->get();
+        $agent = new Agent();
+
+        // スマホなら15件、それ以外なら50件
+        $perPage = $agent->isMobile() ? 12 : 13;
+
+        $players = Player::orderBy('created_at', 'asc')->paginate($perPage);
+
         return view('players.index', compact('players'));
     }
 
