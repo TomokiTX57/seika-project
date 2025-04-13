@@ -156,6 +156,13 @@ class PlayerController extends Controller
         return redirect()->route('players.show', $player)->with('success', 'プレイヤー情報を更新しました');
     }
 
+    // プレイヤーの削除
+    public function destroy(Player $player)
+    {
+        $player->delete();
+        return redirect()->route('players.index')->with('success', 'プレイヤーを削除しました');
+    }
+
     //トナメの取引を保存
     public function storeTournamentTransaction(Request $request, Player $player)
     {

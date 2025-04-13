@@ -39,6 +39,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/players/create', [PlayerController::class, 'create'])->name('players.create');
     Route::get('/players/search', [PlayerController::class, 'search'])->name('players.search');
+    Route::delete('/players/{player}', [PlayerController::class, 'destroy'])->name('players.destroy');
     Route::get('/players/{player}', [PlayerController::class, 'show'])->name('players.show');
     Route::post('/players', [PlayerController::class, 'store'])->name('players.store');
     Route::get('/players/{player}/edit', [PlayerController::class, 'edit'])->name('players.edit');
