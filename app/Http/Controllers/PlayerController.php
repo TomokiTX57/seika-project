@@ -329,7 +329,6 @@ class PlayerController extends Controller
         }
     }
 
-    // 0円システムの精算
     public function settleRing(Player $player)
     {
         DB::beginTransaction();
@@ -349,22 +348,23 @@ class PlayerController extends Controller
             }
 
             foreach ($headers as $header) {
-                // 対象ヘッダーに紐づく明細の初期チップ合計
-                $initialTotal = ZeroSystemDetail::where('zero_system_header_id', $header->id)
+                $in = ZeroSystemDetail::where('zero_system_header_id', $header->id)
                     ->sum(DB::raw('ABS(initial_chips)'));
+                $out = $header->final_chips;
 
-                $finalChips = $header->final_chips;
-                $diff = $finalChips - $initialTotal;
+                // 精算額の決定：in <= out → in, in > out → out
+                $settleAmount = $in <= $out ? $in : $out;
 
-                if ($diff !== 0) {
+                // settleAmount をマイナスで登録（チップを引く）
+                if ($settleAmount > 0) {
                     RingTransaction::create([
                         'player_id' => $player->id,
                         'store_id' => auth()->id(),
-                        'chips' => $diff,
+                        'chips' => -$settleAmount,
                         'is_zero_system' => true,
                         'type' => '0円システム',
                         'action' => '清算',
-                        'comment' => null, // コメントは純粋にユーザー入力のみ
+                        'comment' => '0円システム清算',
                     ]);
                 }
 
