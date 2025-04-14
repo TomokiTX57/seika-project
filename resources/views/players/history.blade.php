@@ -5,7 +5,7 @@
         </h2>
     </x-slot>
 
-    <div class="p-3 overflow-x-auto bg-white shadow rounded">
+    <div class="p-6 bg-white rounded shadow max-w-5xl mx-auto">
         <!-- Bootstrap タブ -->
         <ul class="nav nav-tabs mb-4" id="historyTabs" role="tablist">
             <li class="nav-item">
@@ -30,24 +30,26 @@
                 @if($player->ringTransactions->isEmpty())
                 <p>履歴がありません。</p>
                 @else
-                <table class="table table-bordered table-striped text-xs w-full">
-                    <thead>
-                        <tr>
-                            <th class="whitespace-nowrap">日付</th>
-                            <th class="whitespace-nowrap">チップ</th>
-                            <th class="whitespace-nowrap">合計チップ</th>
-                            <th class="whitespace-nowrap">種別</th>
-                            <th class="whitespace-nowrap">処理</th>
-                            <th class="whitespace-nowrap">会計番号</th>
-                            <th class="whitespace-nowrap">コメント</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($ringTransactions as $tx)
-                        @include('components.transaction-row', ['tx' => $tx])
-                        @endforeach
-                    </tbody>
-                </table>
+                <div class="p-3 overflow-x-auto bg-white shadow rounded">
+                    <table class="table table-bordered table-striped text-xs w-full">
+                        <thead>
+                            <tr>
+                                <th class="whitespace-nowrap">日付</th>
+                                <th class="whitespace-nowrap">チップ</th>
+                                <th class="whitespace-nowrap">合計チップ</th>
+                                <th class="whitespace-nowrap">種別</th>
+                                <th class="whitespace-nowrap">処理</th>
+                                <th class="whitespace-nowrap">会計番号</th>
+                                <th class="whitespace-nowrap">コメント</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($ringTransactions as $tx)
+                            @include('components.transaction-row', ['tx' => $tx])
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
                 @endif
             </div>
             @elseif ($tab === 'tournament')
@@ -56,30 +58,32 @@
                 @if($player->tournamentTransactions->isEmpty())
                 <p>履歴がありません。</p>
                 @else
-                <table class="table table-bordered table-striped text-xs w-full">
-                    <thead>
-                        <tr>
-                            <th class="whitespace-nowrap">日付</th>
-                            <th class="whitespace-nowrap">チップ</th>
-                            <th class="whitespace-nowrap">ポイント</th>
-                            <th class="whitespace-nowrap">エントリー</th>
-                            <th class="whitespace-nowrap">会計番号</th>
-                            <th class="whitespace-nowrap">コメント</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($player->tournamentTransactions->sortByDesc('created_at') as $tx)
-                        <tr>
-                            <td class="whitespace-nowrap">{{ $tx->created_at->format('Y-m-d H:i') }}</td>
-                            <td class="whitespace-nowrap">{{ $tx->chips }}</td>
-                            <td class="whitespace-nowrap">{{ $tx->points }}</td>
-                            <td class="whitespace-nowrap">{{ $tx->entry  }}</td>
-                            <td class="whitespace-nowrap">{{ $tx->accounting_number }}</td>
-                            <td class="whitespace-nowrap">{{ $tx->comment }}</td>
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+                <div class="p-3 overflow-x-auto bg-white shadow rounded">
+                    <table class="table table-bordered table-striped text-xs w-full">
+                        <thead>
+                            <tr>
+                                <th class="whitespace-nowrap">日付</th>
+                                <th class="whitespace-nowrap">チップ</th>
+                                <th class="whitespace-nowrap">ポイント</th>
+                                <th class="whitespace-nowrap">エントリー</th>
+                                <th class="whitespace-nowrap">会計番号</th>
+                                <th class="whitespace-nowrap">コメント</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($player->tournamentTransactions->sortByDesc('created_at') as $tx)
+                            <tr>
+                                <td class="whitespace-nowrap">{{ $tx->created_at->format('Y-m-d H:i') }}</td>
+                                <td class="whitespace-nowrap">{{ $tx->chips }}</td>
+                                <td class="whitespace-nowrap">{{ $tx->points }}</td>
+                                <td class="whitespace-nowrap">{{ $tx->entry  }}</td>
+                                <td class="whitespace-nowrap">{{ $tx->accounting_number }}</td>
+                                <td class="whitespace-nowrap">{{ $tx->comment }}</td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
                 @endif
             </div>
             @endif
