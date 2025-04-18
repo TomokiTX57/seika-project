@@ -14,17 +14,14 @@ class RingTransactionController extends Controller
 
         $request->validate([
             'chips' => 'required|integer',
+            'comment' => 'nullable|string',
+            'accounting_number' => 'nullable|string|max:255',
         ]);
 
         $originalChips = $tx->chips;
         $tx->chips = $request->chips;
-        $tx->save();
-
-        \Log::info('RingTransaction 更新', [
-            'id' => $tx->id,
-            'original_chips' => $originalChips,
-            'updated_chips' => $tx->chips,
-        ]);
+        $tx->comment = $request->comment;
+        $tx->accounting_number = $request->accounting_number;
 
         if ($tx->is_zero_system && $tx->type === '0円システム') {
             if ($tx->action === 'out') {
@@ -60,6 +57,17 @@ class RingTransactionController extends Controller
                 }
             }
         }
+        $tx->save();
+
+        \Log::info('RingTransaction 更新', [
+            'id' => $tx->id,
+            'original_chips' => $originalChips,
+            'updated_chips' => $tx->chips,
+            'comment' => $tx->comment,
+            'accounting_number' => $tx->accounting_number,
+        ]);
+
+
 
         return response()->json(['message' => '更新完了']);
     }

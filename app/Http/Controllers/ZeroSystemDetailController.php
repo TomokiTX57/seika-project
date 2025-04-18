@@ -14,26 +14,49 @@ class ZeroSystemDetailController extends Controller
         return $this->belongsTo(ZeroSystemHeader::class, 'zero_system_header_id');
     }
 
+
     public function update(Request $request, $id)
     {
+        \Log::info('ZeroSystemDetail 更新開始', [
+            'id' => $id,
+            'request' => $request->all(),
+        ]);
+
         $detail = \App\Models\ZeroSystemDetail::findOrFail($id);
 
         $request->validate([
             'chips' => 'required|integer',
+            'accounting_number' => 'nullable|string|max:255',
         ]);
 
         $detail->initial_chips = $request->chips;
         $detail->save();
 
-        // 親ヘッダーの再計算
         $header = $detail->header;
-        $header->sum_initial_chips = $header->details()->sum('initial_chips');
 
-        // final_chips が null のときのみ保存（null以外なら保持）
-        $header->save();
+        if ($header && $header->ringTransaction) {
+            $tx = $header->ringTransaction;
+
+            if ($tx->action === 'in' && $tx->type === '0円システム') {
+                $tx->accounting_number = $request->accounting_number;
+                $tx->save();
+            } else {
+                \Log::info('リングトランザクションの条件が一致しないため更新されませんでした', [
+                    'tx_id' => $tx->id,
+                    'action' => $tx->action,
+                    'type' => $tx->type,
+                ]);
+            }
+        } else {
+            \Log::warning('ZeroSystemHeaderまたはその関連トランザクションが見つかりません', [
+                'detail_id' => $detail->id,
+                'header_id' => $header?->id,
+            ]);
+        }
 
         return response()->json(['message' => '更新完了']);
     }
+
 
     public function destroy($id)
     {

@@ -16,7 +16,10 @@ $tx->zeroSystemHeader->details->isNotEmpty()
     <td>{{ $tx->zeroSystemHeader->sum_initial_chips ?? '―' }}</td>
     <td>{{ $tx->type ?? '―' }}</td>
     <td>{{ $tx->action ?? '―' }}</td>
-    <td>{{ $tx->accounting_number ?? '―' }}</td>
+    <td>
+        <span class="accounting-number-display" id="display-accounting-number-detail-{{ $detail->id }}">{{ $tx->accounting_number ?? '―' }}</span>
+        <input type="text" class="form-control accounting-number-edit d-none" id="edit-accounting-number-detail-{{ $detail->id }}" value="{{ $tx->accounting_number }}">
+    </td>
     <td>
         {{-- コメントはring_transactions側のみなので非表示にしてもOK --}}
         <span class="comment-display" id="display-comment-detail-{{ $detail->id }}">―</span>
@@ -40,7 +43,10 @@ $tx->zeroSystemHeader->details->isNotEmpty()
     <td>―</td>
     <td>{{ $tx->type ?? '―' }}</td>
     <td>{{ $tx->action ?? '―' }}</td>
-    <td>{{ $tx->accounting_number ?? '―' }}</td>
+    <td>
+        <span class="accounting-number-display" id="display-accounting-number-ring-{{ $tx->id }}">{{ $tx->accounting_number ?? '―' }}</span>
+        <input type="text" class="form-control accounting-number-edit d-none" id="edit-accounting-number-ring-{{ $tx->id }}" value="{{ $tx->accounting_number }}">
+    </td>
     <td>
         <span class="comment-display" id="display-comment-ring-{{ $tx->id }}">{{ $tx->comment ?? '―' }}</span>
         <input type="text" class="form-control comment-edit d-none" id="edit-comment-ring-{{ $tx->id }}" value="{{ $tx->comment }}">

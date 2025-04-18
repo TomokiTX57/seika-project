@@ -12,14 +12,28 @@ document.addEventListener("DOMContentLoaded", () => {
             ?.classList.remove("d-none");
 
         document.getElementById(`save-btn-${id}`)?.classList.remove("d-none");
+        document
+            .getElementById(`display-accounting-number-${id}`)
+            ?.classList.add("d-none");
+        document
+            .getElementById(`edit-accounting-number-${id}`)
+            ?.classList.remove("d-none");
     };
 
     // 保存処理
     window.saveEdit = (id) => {
         const newChips = document.getElementById(`edit-chips-${id}`)?.value;
         const newComment = document.getElementById(`edit-comment-${id}`)?.value;
+        const newAccountingNumber = document.getElementById(
+            `edit-accounting-number-${id}`
+        )?.value;
 
-        console.log("送信内容:", { id, newChips, newComment });
+        console.log("送信内容:", {
+            id,
+            newChips,
+            newComment,
+            newAccountingNumber,
+        });
 
         // detail- or ring- の判別
         let url = "";
@@ -39,7 +53,11 @@ document.addEventListener("DOMContentLoaded", () => {
                     .querySelector('meta[name="csrf-token"]')
                     .getAttribute("content"),
             },
-            body: JSON.stringify({ chips: newChips, comment: newComment }),
+            body: JSON.stringify({
+                chips: newChips,
+                comment: newComment,
+                accounting_number: newAccountingNumber,
+            }),
         })
             .then((response) => {
                 console.log("サーバーレスポンス:", response.status);
