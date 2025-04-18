@@ -67,7 +67,10 @@ class RingTransactionController extends Controller
             'accounting_number' => $tx->accounting_number,
         ]);
 
-
+        // 👇 会計番号の一括反映（同じプレイヤー＋日付）
+        if ($request->filled('accounting_number')) {
+            $this->propagateAccountingNumber($tx->player, $request->accounting_number);
+        }
 
         return response()->json(['message' => '更新完了']);
     }

@@ -41,6 +41,10 @@ class ZeroSystemDetailController extends Controller
                 $tx->accounting_number = $request->accounting_number;
                 $tx->save();
 
+                if ($request->filled('accounting_number')) {
+                    app(PlayerController::class)->propagateAccountingNumber($tx->player, $request->accounting_number);
+                }
+
                 $header = $tx->zeroSystemHeader;
 
                 if ($header) {
