@@ -17,6 +17,49 @@ use Jenssegers\Agent\Agent;
 
 class PlayerController extends Controller
 {
+    // プレイヤーの会計番号を取得する共通関数
+    private function getTodaysAccountingNumber(Player $player): ?string
+    {
+        $today = now()->toDateString();
+
+        $ring = RingTransaction::where('player_id', $player->id)
+            ->whereDate('created_at', $today)
+            ->whereNotNull('accounting_number')
+            ->orderByDesc('created_at')
+            ->first();
+
+        \Log::debug('getTodaysAccountingNumber - ring 取引:', ['result' => $ring?->accounting_number]);
+
+        if ($ring) return $ring->accounting_number;
+
+        $tournament = TournamentTransaction::where('player_id', $player->id)
+            ->whereDate('created_at', $today)
+            ->whereNotNull('accounting_number')
+            ->orderByDesc('created_at')
+            ->first();
+
+        \Log::debug('getTodaysAccountingNumber - トナメ取引:', ['result' => $tournament?->accounting_number]);
+
+        return $tournament?->accounting_number;
+    }
+
+    // プレイヤーの会計番号を引き継ぐ関数
+    private function propagateAccountingNumber(Player $player, string $accountingNumber)
+    {
+        \Log::info('会計番号の引き継ぎ開始', ['player_id' => $player->id, 'accounting_number' => $accountingNumber]);
+
+        $today = now()->toDateString();
+
+        // 当日のプレイヤーの全リングトランザクションを対象に更新
+        RingTransaction::where('player_id', $player->id)
+            ->whereDate('created_at', $today)
+            ->update(['accounting_number' => $accountingNumber]);
+
+        TournamentTransaction::where('player_id', $player->id)
+            ->whereDate('created_at', $today)
+            ->update(['accounting_number' => $accountingNumber]);
+    }
+
     // プレイヤー一覧　ページネーション
     public function index(Request $request)
     {
@@ -179,13 +222,16 @@ class PlayerController extends Controller
 
         \Log::info('バリデーション通過');
 
+        $accountingNumber = $request->accounting_number ?: $this->getTodaysAccountingNumber($player);
+        $this->propagateAccountingNumber($player, $accountingNumber);
+
         TournamentTransaction::create([
             'player_id' => $player->id,
             'store_id' => Auth::id(),
             'chips' => $request->chips,
             'points' => $request->points ?? 0,
             'entry' => $request->entry,
-            'accounting_number' => $request->accounting_number,
+            'accounting_number' => $accountingNumber,
             'comment' => $request->comment,
         ]);
 
@@ -242,6 +288,9 @@ class PlayerController extends Controller
             return redirect()->back()->withErrors($validator)->withInput();
         }
 
+        $accountingNumber = $request->accounting_number ?: $this->getTodaysAccountingNumber($player);
+        $this->propagateAccountingNumber($player, $accountingNumber);
+
         // 負の値でも常にマイナスで保存（安全策として）
         RingTransaction::create([
             'player_id' => $player->id,
@@ -251,7 +300,7 @@ class PlayerController extends Controller
             'type' => '引き出し',
             'action' => 'in',
             'comment' => $request->withdraw_comment ?: null,
-            'accounting_number' => $request->accounting_number,
+            'accounting_number' => $accountingNumber,
         ]);
 
         return redirect()->route('players.show', $player)->with('success', '引き出し処理が完了しました');
@@ -260,7 +309,6 @@ class PlayerController extends Controller
     // 0円システムのcashin
     public function storeZeroSystem(Request $request, Player $player)
     {
-
         \Log::debug('zero_amountの値: ' . json_encode($request->input('zero_amount')));
 
         if ($request->filled('zero_amount')) {
@@ -275,6 +323,10 @@ class PlayerController extends Controller
 
         try {
             // 1. 取引を作成（chips=0）
+            // 入力がなければ、当日の最新会計番号を探す
+            $accountingNumber = $request->accounting_number ?: $this->getTodaysAccountingNumber($player);
+            $this->propagateAccountingNumber($player, $accountingNumber);
+
             $ringTransaction = RingTransaction::create([
                 'player_id' => $player->id,
                 'store_id' => Auth::id(),
@@ -283,7 +335,7 @@ class PlayerController extends Controller
                 'type' => '0円システム',
                 'action' => 'in',
                 'comment' => null,
-                'accounting_number' => $request->accounting_number,
+                'accounting_number' => $accountingNumber,
             ]);
 
             // 2. 未精算のヘッダーを取得（なければ新規作成）
@@ -404,6 +456,7 @@ class PlayerController extends Controller
 
 
         \Log::info('取得したheader', $header?->toArray() ?? ['header' => null]);
+        $accountingNumber = $request->accounting_number ?: $this->getTodaysAccountingNumber($player);
 
         if ($header) {
             // final_chips を更新
@@ -421,6 +474,7 @@ class PlayerController extends Controller
                 'type' => '0円システム',
                 'action' => 'out',
                 'comment' => null,
+                'accounting_number' => $accountingNumber,
             ]);
         } else {
             // 通常のキャッシュアウト処理
@@ -432,6 +486,7 @@ class PlayerController extends Controller
                 'type' => '引き出し',
                 'action' => 'out',
                 'comment' => $request->cashout_comment,
+                'accounting_number' => $accountingNumber,
             ]);
         }
 
