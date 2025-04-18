@@ -41,23 +41,6 @@ class ZeroSystemDetailController extends Controller
                 $tx->accounting_number = $request->accounting_number;
                 $tx->save();
 
-                if ($request->filled('accounting_number')) {
-                    app(PlayerController::class)->propagateAccountingNumber($tx->player, $request->accounting_number);
-                }
-
-                $header = $tx->zeroSystemHeader;
-
-                if ($header) {
-                    $inTxId = $header->ring_transaction_id;
-
-                    \App\Models\RingTransaction::where('type', '0円システム')
-                        ->whereNotNull('action')
-                        ->where(function ($query) use ($inTxId) {
-                            $query->where('id', $inTxId)
-                                ->orWhereHas('zeroSystemHeader', fn($q) => $q->where('ring_transaction_id', $inTxId));
-                        })
-                        ->update(['accounting_number' => $request->accounting_number]);
-                }
             } else {
                 \Log::info('リングトランザクションの条件が一致しないため更新されませんでした', [
                     'tx_id' => $tx->id,
