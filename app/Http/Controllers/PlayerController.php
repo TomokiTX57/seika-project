@@ -289,7 +289,10 @@ class PlayerController extends Controller
         }
 
         $accountingNumber = $request->accounting_number ?: $this->getTodaysAccountingNumber($player);
-        $this->propagateAccountingNumber($player, $accountingNumber);
+
+        if (!is_null($accountingNumber)) {
+            $this->propagateAccountingNumber($player, $accountingNumber);
+        }
 
         // 負の値でも常にマイナスで保存（安全策として）
         RingTransaction::create([
