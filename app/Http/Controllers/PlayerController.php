@@ -14,6 +14,9 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Jenssegers\Agent\Agent;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Session;
+
 
 class PlayerController extends Controller
 {
@@ -266,6 +269,50 @@ class PlayerController extends Controller
         $players = Player::where('is_subscribed', true)->orderBy('player_name')->get();
         return view('players.subscribed', compact('players'));
     }
+
+    public function uploadSubscriptionCsv(Request $request)
+    {
+        $request->validate([
+            'csv_file' => 'required|file|mimes:csv,txt',
+        ]);
+
+        $path = $request->file('csv_file')->storeAs('csv', 'subscription.csv');
+
+        // フラグを使って「アップロード完了」をビューに伝える
+        Session::flash('csv_uploaded', true);
+
+        return redirect()->route('players.subscribed')->with('success', 'CSVファイルをアップロードしました。');
+    }
+
+    public function updateSubscriptionStatus()
+    {
+        $path = storage_path('app/csv/subscription.csv');
+
+        if (!file_exists($path)) {
+            return redirect()->route('players.subscribed')->with('success', 'CSVファイルが見つかりません。');
+        }
+
+        $handle = fopen($path, 'r');
+        $header = fgetcsv($handle); // ヘッダー読み飛ばし
+
+        while (($data = fgetcsv($handle)) !== false) {
+            $playerName = trim($data[5]); // F列（index=5）
+            $contractStatus = trim($data[11]); // L列（index=11）
+
+            if ($contractStatus === '有効') {
+                $player = \App\Models\Player::where('player_name', $playerName)->first();
+                if ($player) {
+                    $player->is_subscribed = true;
+                    $player->save();
+                }
+            }
+        }
+
+        fclose($handle);
+
+        return redirect()->route('players.subscribed')->with('success', 'サブスク情報を更新しました。');
+    }
+
 
     public function withdrawRing(Request $request, Player $player)
     {
