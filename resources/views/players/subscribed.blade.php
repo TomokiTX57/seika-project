@@ -4,6 +4,31 @@
     </x-slot>
 
     <div class="p-1">
+        @if (session('success'))
+        <div class="bg-green-100 text-green-800 p-2 rounded mb-4">
+            {{ session('success') }}
+        </div>
+        @endif
+
+        <form action="{{ route('players.upload_subscription_csv') }}" method="POST" enctype="multipart/form-data" class="mb-4">
+            @csrf
+            <label class="block mb-2">CSVファイルをアップロード:</label>
+            <input type="file" name="csv_file" accept=".csv" required class="border p-2">
+            <button type="submit" class="ml-2 px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600">
+                アップロード
+            </button>
+        </form>
+
+        @if (session('csv_uploaded'))
+        <div class="mb-4 text-green-600">CSVアップロードが完了しました。</div>
+        <form action="{{ route('players.update_subscription_status') }}" method="POST">
+            @csrf
+            <button type="submit" class="px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600">
+                サブスク情報を更新
+            </button>
+        </form>
+        @endif
+
         <div class="bg-white shadow rounded p-4">
             <table class="w-full border-collapse">
                 <thead>

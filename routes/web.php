@@ -70,6 +70,10 @@ Route::middleware('auth')->group(function () {
     // RingTransaction 更新・削除ルート（編集・削除ボタン対応）
     Route::put('/ring-transactions/{id}', [RingTransactionController::class, 'update']);
     Route::delete('/ring-transactions/{id}', [RingTransactionController::class, 'destroy']);
+
+    //サブスクCSVアップロードとステータス更新
+    Route::post('/players/upload-subscription-csv', [PlayerController::class, 'uploadSubscriptionCsv'])->name('players.upload_subscription_csv');
+    Route::post('/players/update-subscription-status', [PlayerController::class, 'updateSubscriptionStatus'])->name('players.update_subscription_status');
 });
 
 require __DIR__ . '/auth.php';
