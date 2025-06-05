@@ -47,7 +47,7 @@ class PlayerController extends Controller
     }
 
     // プレイヤーの会計番号を引き継ぐ関数
-    public function propagateAccountingNumber(Player $player, string $accountingNumber)
+    public function propagateAccountingNumber(Player $player, ?string $accountingNumber)
     {
         \Log::info('会計番号の引き継ぎ開始', ['player_id' => $player->id, 'accounting_number' => $accountingNumber]);
 
